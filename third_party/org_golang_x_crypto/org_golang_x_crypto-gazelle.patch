@@ -1,0 +1,1321 @@
+diff -N /dev/null acme/autocert/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ acme/autocert/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,27 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "autocert.go",
++        "cache.go",
++        "listener.go",
++        "renewal.go",
++    ],
++    importpath = "golang.org/x/crypto/acme/autocert",
++    visibility = ["//visibility:public"],
++    deps = ["//acme:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "autocert_test.go",
++        "cache_test.go",
++        "example_test.go",
++        "renewal_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = ["//acme:go_default_library"],
++)
++
+diff -N /dev/null acme/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ acme/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,23 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "acme.go",
++        "jws.go",
++        "types.go",
++    ],
++    importpath = "golang.org/x/crypto/acme",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "acme_test.go",
++        "jws_test.go",
++        "types_test.go",
++    ],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null argon2/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ argon2/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,23 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "argon2.go",
++        "blake2b.go",
++        "blamka_amd64.go",
++        "blamka_amd64.s",
++        "blamka_generic.go",
++        "blamka_ref.go",
++    ],
++    importpath = "golang.org/x/crypto/argon2",
++    visibility = ["//visibility:public"],
++    deps = ["//blake2b:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["argon2_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null bcrypt/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ bcrypt/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,19 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "base64.go",
++        "bcrypt.go",
++    ],
++    importpath = "golang.org/x/crypto/bcrypt",
++    visibility = ["//visibility:public"],
++    deps = ["//blowfish:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["bcrypt_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null blake2b/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ blake2b/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,25 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "blake2b.go",
++        "blake2bAVX2_amd64.go",
++        "blake2bAVX2_amd64.s",
++        "blake2b_amd64.go",
++        "blake2b_amd64.s",
++        "blake2b_generic.go",
++        "blake2b_ref.go",
++        "blake2x.go",
++        "register.go",
++    ],
++    importpath = "golang.org/x/crypto/blake2b",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["blake2b_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null blake2s/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ blake2s/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,25 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "blake2s.go",
++        "blake2s_386.go",
++        "blake2s_386.s",
++        "blake2s_amd64.go",
++        "blake2s_amd64.s",
++        "blake2s_generic.go",
++        "blake2s_ref.go",
++        "blake2x.go",
++        "register.go",
++    ],
++    importpath = "golang.org/x/crypto/blake2s",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["blake2s_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null blowfish/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ blowfish/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,19 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "block.go",
++        "cipher.go",
++        "const.go",
++    ],
++    importpath = "golang.org/x/crypto/blowfish",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["blowfish_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null bn256/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ bn256/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,27 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "bn256.go",
++        "constants.go",
++        "curve.go",
++        "gfp12.go",
++        "gfp2.go",
++        "gfp6.go",
++        "optate.go",
++        "twist.go",
++    ],
++    importpath = "golang.org/x/crypto/bn256",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "bn256_test.go",
++        "example_test.go",
++    ],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null cast5/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ cast5/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["cast5.go"],
++    importpath = "golang.org/x/crypto/cast5",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["cast5_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null chacha20poly1305/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ chacha20poly1305/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,28 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "chacha20poly1305.go",
++        "chacha20poly1305_amd64.go",
++        "chacha20poly1305_amd64.s",
++        "chacha20poly1305_generic.go",
++        "chacha20poly1305_noasm.go",
++    ],
++    importpath = "golang.org/x/crypto/chacha20poly1305",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//internal/chacha20:go_default_library",
++        "//poly1305:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "chacha20poly1305_test.go",
++        "chacha20poly1305_vectors_test.go",
++    ],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null cryptobyte/asn1/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ cryptobyte/asn1/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,9 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["asn1.go"],
++    importpath = "golang.org/x/crypto/cryptobyte/asn1",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null cryptobyte/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ cryptobyte/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,25 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "asn1.go",
++        "builder.go",
++        "string.go",
++    ],
++    importpath = "golang.org/x/crypto/cryptobyte",
++    visibility = ["//visibility:public"],
++    deps = ["//cryptobyte/asn1:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "asn1_test.go",
++        "cryptobyte_test.go",
++        "example_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = ["//cryptobyte/asn1:go_default_library"],
++)
++
+diff -N /dev/null curve25519/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ curve25519/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,26 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "const_amd64.h",
++        "const_amd64.s",
++        "cswap_amd64.s",
++        "curve25519.go",
++        "doc.go",
++        "freeze_amd64.s",
++        "ladderstep_amd64.s",
++        "mont25519_amd64.go",
++        "mul_amd64.s",
++        "square_amd64.s",
++    ],
++    importpath = "golang.org/x/crypto/curve25519",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["curve25519_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null ed25519/internal/edwards25519/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ed25519/internal/edwards25519/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,12 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "const.go",
++        "edwards25519.go",
++    ],
++    importpath = "golang.org/x/crypto/ed25519/internal/edwards25519",
++    visibility = ["//ed25519:__subpackages__"],
++)
++
+diff -N /dev/null ed25519/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ed25519/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,18 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["ed25519.go"],
++    importpath = "golang.org/x/crypto/ed25519",
++    visibility = ["//visibility:public"],
++    deps = ["//ed25519/internal/edwards25519:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["ed25519_test.go"],
++    data = glob(["testdata/**"]),
++    embed = [":go_default_library"],
++    deps = ["//ed25519/internal/edwards25519:go_default_library"],
++)
++
+diff -N /dev/null hkdf/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ hkdf/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,18 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["hkdf.go"],
++    importpath = "golang.org/x/crypto/hkdf",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "example_test.go",
++        "hkdf_test.go",
++    ],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null internal/chacha20/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/chacha20/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["chacha_generic.go"],
++    importpath = "golang.org/x/crypto/internal/chacha20",
++    visibility = ["//:__subpackages__"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["chacha_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null md4/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ md4/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "md4.go",
++        "md4block.go",
++    ],
++    importpath = "golang.org/x/crypto/md4",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "example_test.go",
++        "md4_test.go",
++    ],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null nacl/auth/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ nacl/auth/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,18 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["auth.go"],
++    importpath = "golang.org/x/crypto/nacl/auth",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "auth_test.go",
++        "example_test.go",
++    ],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null nacl/box/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ nacl/box/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,24 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["box.go"],
++    importpath = "golang.org/x/crypto/nacl/box",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//curve25519:go_default_library",
++        "//nacl/secretbox:go_default_library",
++        "//salsa20/salsa:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "box_test.go",
++        "example_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = ["//curve25519:go_default_library"],
++)
++
+diff -N /dev/null nacl/secretbox/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ nacl/secretbox/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,22 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["secretbox.go"],
++    importpath = "golang.org/x/crypto/nacl/secretbox",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//poly1305:go_default_library",
++        "//salsa20/salsa:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "example_test.go",
++        "secretbox_test.go",
++    ],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null ocsp/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ocsp/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["ocsp.go"],
++    importpath = "golang.org/x/crypto/ocsp",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["ocsp_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null openpgp/armor/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ openpgp/armor/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,19 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "armor.go",
++        "encode.go",
++    ],
++    importpath = "golang.org/x/crypto/openpgp/armor",
++    visibility = ["//visibility:public"],
++    deps = ["//openpgp/errors:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["armor_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null openpgp/clearsign/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ openpgp/clearsign/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["clearsign.go"],
++    importpath = "golang.org/x/crypto/openpgp/clearsign",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//openpgp/armor:go_default_library",
++        "//openpgp/errors:go_default_library",
++        "//openpgp/packet:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["clearsign_test.go"],
++    embed = [":go_default_library"],
++    deps = ["//openpgp:go_default_library"],
++)
++
+diff -N /dev/null openpgp/elgamal/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ openpgp/elgamal/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["elgamal.go"],
++    importpath = "golang.org/x/crypto/openpgp/elgamal",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["elgamal_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null openpgp/errors/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ openpgp/errors/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,9 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["errors.go"],
++    importpath = "golang.org/x/crypto/openpgp/errors",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null openpgp/packet/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ openpgp/packet/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,59 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "compressed.go",
++        "config.go",
++        "encrypted_key.go",
++        "literal.go",
++        "ocfb.go",
++        "one_pass_signature.go",
++        "opaque.go",
++        "packet.go",
++        "private_key.go",
++        "public_key.go",
++        "public_key_v3.go",
++        "reader.go",
++        "signature.go",
++        "signature_v3.go",
++        "symmetric_key_encrypted.go",
++        "symmetrically_encrypted.go",
++        "userattribute.go",
++        "userid.go",
++    ],
++    importpath = "golang.org/x/crypto/openpgp/packet",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//cast5:go_default_library",
++        "//openpgp/elgamal:go_default_library",
++        "//openpgp/errors:go_default_library",
++        "//openpgp/s2k:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "compressed_test.go",
++        "encrypted_key_test.go",
++        "ocfb_test.go",
++        "opaque_test.go",
++        "packet_test.go",
++        "private_key_test.go",
++        "public_key_test.go",
++        "public_key_v3_test.go",
++        "signature_test.go",
++        "signature_v3_test.go",
++        "symmetric_key_encrypted_test.go",
++        "symmetrically_encrypted_test.go",
++        "userattribute_test.go",
++        "userid_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//openpgp/armor:go_default_library",
++        "//openpgp/errors:go_default_library",
++    ],
++)
++
+diff -N /dev/null openpgp/s2k/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ openpgp/s2k/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,17 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["s2k.go"],
++    importpath = "golang.org/x/crypto/openpgp/s2k",
++    visibility = ["//visibility:public"],
++    deps = ["//openpgp/errors:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["s2k_test.go"],
++    embed = [":go_default_library"],
++    deps = ["//ripemd160:go_default_library"],
++)
++
+diff -N /dev/null openpgp/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ openpgp/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,36 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "canonical_text.go",
++        "keys.go",
++        "read.go",
++        "write.go",
++    ],
++    importpath = "golang.org/x/crypto/openpgp",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//openpgp/armor:go_default_library",
++        "//openpgp/errors:go_default_library",
++        "//openpgp/packet:go_default_library",
++        "//openpgp/s2k:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "canonical_text_test.go",
++        "keys_test.go",
++        "read_test.go",
++        "write_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//openpgp/armor:go_default_library",
++        "//openpgp/errors:go_default_library",
++        "//openpgp/packet:go_default_library",
++    ],
++)
++
+diff -N /dev/null otr/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ otr/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,18 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "otr.go",
++        "smp.go",
++    ],
++    importpath = "golang.org/x/crypto/otr",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["otr_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null pbkdf2/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ pbkdf2/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["pbkdf2.go"],
++    importpath = "golang.org/x/crypto/pbkdf2",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["pbkdf2_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null pkcs12/internal/rc2/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ pkcs12/internal/rc2/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,18 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["rc2.go"],
++    importpath = "golang.org/x/crypto/pkcs12/internal/rc2",
++    visibility = ["//pkcs12:__subpackages__"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "bench_test.go",
++        "rc2_test.go",
++    ],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null pkcs12/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ pkcs12/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,30 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "bmp-string.go",
++        "crypto.go",
++        "errors.go",
++        "mac.go",
++        "pbkdf.go",
++        "pkcs12.go",
++        "safebags.go",
++    ],
++    importpath = "golang.org/x/crypto/pkcs12",
++    visibility = ["//visibility:public"],
++    deps = ["//pkcs12/internal/rc2:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "bmp-string_test.go",
++        "crypto_test.go",
++        "mac_test.go",
++        "pbkdf_test.go",
++        "pkcs12_test.go",
++    ],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null poly1305/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ poly1305/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,22 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "poly1305.go",
++        "sum_amd64.go",
++        "sum_amd64.s",
++        "sum_arm.go",
++        "sum_arm.s",
++        "sum_ref.go",
++    ],
++    importpath = "golang.org/x/crypto/poly1305",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["poly1305_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null ripemd160/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ripemd160/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,18 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "ripemd160.go",
++        "ripemd160block.go",
++    ],
++    importpath = "golang.org/x/crypto/ripemd160",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["ripemd160_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null salsa20/salsa/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ salsa20/salsa/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "hsalsa20.go",
++        "salsa2020_amd64.s",
++        "salsa208.go",
++        "salsa20_amd64.go",
++        "salsa20_ref.go",
++    ],
++    importpath = "golang.org/x/crypto/salsa20/salsa",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["salsa_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null salsa20/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ salsa20/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,16 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["salsa20.go"],
++    importpath = "golang.org/x/crypto/salsa20",
++    visibility = ["//visibility:public"],
++    deps = ["//salsa20/salsa:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["salsa20_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null scrypt/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ scrypt/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,19 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["scrypt.go"],
++    importpath = "golang.org/x/crypto/scrypt",
++    visibility = ["//visibility:public"],
++    deps = ["//pbkdf2:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "example_test.go",
++        "scrypt_test.go",
++    ],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null sha3/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ sha3/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,28 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "hashes.go",
++        "keccakf.go",
++        "keccakf_amd64.go",
++        "keccakf_amd64.s",
++        "register.go",
++        "sha3.go",
++        "shake.go",
++        "xor.go",
++        "xor_generic.go",
++        "xor_unaligned.go",
++    ],
++    importpath = "golang.org/x/crypto/sha3",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["sha3_test.go"],
++    data = glob(["testdata/**"]),
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null ssh/agent/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ssh/agent/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,34 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "client.go",
++        "forward.go",
++        "keyring.go",
++        "server.go",
++    ],
++    importpath = "golang.org/x/crypto/ssh/agent",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//ed25519:go_default_library",
++        "//ssh:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "client_test.go",
++        "example_test.go",
++        "keyring_test.go",
++        "server_test.go",
++        "testdata_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//ssh:go_default_library",
++        "//ssh/testdata:go_default_library",
++    ],
++)
++
+diff -N /dev/null ssh/knownhosts/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ssh/knownhosts/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,17 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["knownhosts.go"],
++    importpath = "golang.org/x/crypto/ssh/knownhosts",
++    visibility = ["//visibility:public"],
++    deps = ["//ssh:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["knownhosts_test.go"],
++    embed = [":go_default_library"],
++    deps = ["//ssh:go_default_library"],
++)
++
+diff -N /dev/null ssh/terminal/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ssh/terminal/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,50 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "terminal.go",
++        "util.go",
++        "util_bsd.go",
++        "util_linux.go",
++        "util_plan9.go",
++        "util_solaris.go",
++        "util_windows.go",
++    ],
++    importpath = "golang.org/x/crypto/ssh/terminal",
++    visibility = ["//visibility:public"],
++    deps = select({
++        "@io_bazel_rules_go//go/platform:darwin": [
++            "@org_golang_x_sys//unix:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:dragonfly": [
++            "@org_golang_x_sys//unix:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:freebsd": [
++            "@org_golang_x_sys//unix:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:linux": [
++            "@org_golang_x_sys//unix:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:netbsd": [
++            "@org_golang_x_sys//unix:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:openbsd": [
++            "@org_golang_x_sys//unix:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:solaris": [
++            "@org_golang_x_sys//unix:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:windows": [
++            "@org_golang_x_sys//windows:go_default_library",
++        ],
++        "//conditions:default": [],
++    }),
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["terminal_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null ssh/test/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ssh/test/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,49 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["doc.go"],
++    importpath = "golang.org/x/crypto/ssh/test",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "agent_unix_test.go",
++        "banner_test.go",
++        "cert_test.go",
++        "dial_unix_test.go",
++        "forward_unix_test.go",
++        "multi_auth_test.go",
++        "session_test.go",
++        "test_unix_test.go",
++        "testdata_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//ssh:go_default_library",
++        "//ssh/testdata:go_default_library",
++    ] + select({
++        "@io_bazel_rules_go//go/platform:darwin": [
++            "//ssh/agent:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:dragonfly": [
++            "//ssh/agent:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:freebsd": [
++            "//ssh/agent:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:linux": [
++            "//ssh/agent:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:netbsd": [
++            "//ssh/agent:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:openbsd": [
++            "//ssh/agent:go_default_library",
++        ],
++        "//conditions:default": [],
++    }),
++)
++
+diff -N /dev/null ssh/testdata/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ssh/testdata/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,12 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "keys.go",
++    ],
++    importpath = "golang.org/x/crypto/ssh/testdata",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null ssh/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ssh/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,65 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "buffer.go",
++        "certs.go",
++        "channel.go",
++        "cipher.go",
++        "client.go",
++        "client_auth.go",
++        "common.go",
++        "connection.go",
++        "doc.go",
++        "handshake.go",
++        "kex.go",
++        "keys.go",
++        "mac.go",
++        "messages.go",
++        "mux.go",
++        "server.go",
++        "session.go",
++        "streamlocal.go",
++        "tcpip.go",
++        "transport.go",
++    ],
++    importpath = "golang.org/x/crypto/ssh",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//curve25519:go_default_library",
++        "//ed25519:go_default_library",
++        "//internal/chacha20:go_default_library",
++        "//poly1305:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "benchmark_test.go",
++        "buffer_test.go",
++        "certs_test.go",
++        "cipher_test.go",
++        "client_auth_test.go",
++        "client_test.go",
++        "example_test.go",
++        "handshake_test.go",
++        "kex_test.go",
++        "keys_test.go",
++        "mempipe_test.go",
++        "messages_test.go",
++        "mux_test.go",
++        "session_test.go",
++        "tcpip_test.go",
++        "testdata_test.go",
++        "transport_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//ed25519:go_default_library",
++        "//ssh/terminal:go_default_library",
++        "//ssh/testdata:go_default_library",
++    ],
++)
++
+diff -N /dev/null tea/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ tea/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["cipher.go"],
++    importpath = "golang.org/x/crypto/tea",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["tea_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null twofish/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ twofish/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["twofish.go"],
++    importpath = "golang.org/x/crypto/twofish",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["twofish_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null xtea/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xtea/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,18 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "block.go",
++        "cipher.go",
++    ],
++    importpath = "golang.org/x/crypto/xtea",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["xtea_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null xts/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xts/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["xts.go"],
++    importpath = "golang.org/x/crypto/xts",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["xts_test.go"],
++    embed = [":go_default_library"],
++)
++

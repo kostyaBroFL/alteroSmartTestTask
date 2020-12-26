@@ -13,16 +13,15 @@ http_archive(
 )
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
 go_rules_dependencies()
-go_register_toolchains(version = "1.15.6")
+go_register_toolchains(go_version = "1.15.6")
 
-# LICENSE: Apache 2.0 (https://github.com/bazelbuild/rules_proto/blob/master/LICENSE).
 http_archive(
     name = "rules_proto",
-    sha256 = "602e7161d9195e50246177e7c55b2f39950a9cf7366f74ed5f22fd45750cd208",
-    strip_prefix = "rules_proto-97d8af4dc474595af3900dd85cb3a29ad28cc313",
+    sha256 = "7994a4587e00b9049fed87390fc0d5ff62e0077c1ae8a0761d618e4dce2c525c",
+    strip_prefix = "rules_proto-33549b80b8097502de2a966d764c8d23c59f4d08",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
-        "https://github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
+        # master, as of 2019-11-04
+        "https://github.com/bazelbuild/rules_proto/archive/33549b80b8097502de2a966d764c8d23c59f4d08.tar.gz",
     ],
 )
 load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
@@ -49,4 +48,35 @@ http_archive(
     urls = [
         "https://github.com/mwitkow/go-proto-validators/archive/fbdcedf3a5550890154208a722600dd6af252902.zip",  # master, as of 2019-03-03
     ],
+)
+
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains")
+
+load("@io_bazel_rules_go//proto:gogo.bzl", "gogo_special_proto")
+
+http_archive(
+    name = "org_golang_google_grpc",
+    patch_args = ["-p1"],
+    patches = [
+        "//third_party:org_golang_google_grpc/org_golang_google_grpc-gazelle.patch",
+    ],
+    sha256 = "99c2d8e0392b938ab9867a60451964132a43ef67b2a15f8273544145be8006ff",
+    strip_prefix = "grpc-go-1.24.0",
+    type = "zip",
+    urls = ["https://github.com/grpc/grpc-go/archive/v1.24.0.zip"],
+    # gazelle args: -go_prefix google.golang.org/grpc
+)
+
+http_archive(
+    name = "org_golang_x_net",
+    patch_args = ["-p1"],
+    patches = [
+        "//third_party:org_golang_x_net/org_golang_x_net-gazelle.patch",
+    ],
+    sha256 = "e3ecef768e2834542bdefaf99d047b18bfc81c1ffe5195571102f7ce863a2edf",
+    strip_prefix = "net-0deb6923b6d97481cb43bc1043fe5b72a0143032",
+    type = "zip",
+    # master, as of 2019-11-01
+    urls = ["https://github.com/golang/net/archive/0deb6923b6d97481cb43bc1043fe5b72a0143032.zip"],
+    # gazelle args: -go_prefix golang.org/x/net
 )

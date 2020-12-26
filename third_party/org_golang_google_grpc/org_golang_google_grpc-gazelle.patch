@@ -1,0 +1,4201 @@
+diff -N /dev/null balancer/base/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ balancer/base/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,18 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "balancer.go",
++        "base.go",
++    ],
++    importpath = "google.golang.org/grpc/balancer/base",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//balancer:go_default_library",
++        "//connectivity:go_default_library",
++        "//grpclog:go_default_library",
++        "//resolver:go_default_library",
++    ],
++)
++
+diff -N /dev/null balancer/grpclb/grpc_lb_v1/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ balancer/grpclb/grpc_lb_v1/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,17 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["load_balancer.pb.go"],
++    importpath = "google.golang.org/grpc/balancer/grpclb/grpc_lb_v1",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//codes:go_default_library",
++        "//status:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:timestamp_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null balancer/grpclb/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ balancer/grpclb/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,64 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "grpclb.go",
++        "grpclb_config.go",
++        "grpclb_picker.go",
++        "grpclb_remote_balancer.go",
++        "grpclb_util.go",
++    ],
++    importpath = "google.golang.org/grpc/balancer/grpclb",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//balancer:go_default_library",
++        "//balancer/grpclb/grpc_lb_v1:go_default_library",
++        "//balancer/roundrobin:go_default_library",
++        "//codes:go_default_library",
++        "//connectivity:go_default_library",
++        "//credentials:go_default_library",
++        "//grpclog:go_default_library",
++        "//internal:go_default_library",
++        "//internal/backoff:go_default_library",
++        "//internal/channelz:go_default_library",
++        "//internal/grpcrand:go_default_library",
++        "//keepalive:go_default_library",
++        "//metadata:go_default_library",
++        "//resolver:go_default_library",
++        "//serviceconfig:go_default_library",
++        "//status:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:timestamp_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "grpclb_config_test.go",
++        "grpclb_test.go",
++        "grpclb_test_util_test.go",
++        "grpclb_util_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//balancer:go_default_library",
++        "//balancer/grpclb/grpc_lb_v1:go_default_library",
++        "//codes:go_default_library",
++        "//credentials:go_default_library",
++        "//grpclog/glogger:go_default_library",
++        "//internal/leakcheck:go_default_library",
++        "//metadata:go_default_library",
++        "//peer:go_default_library",
++        "//resolver:go_default_library",
++        "//resolver/manual:go_default_library",
++        "//serviceconfig:go_default_library",
++        "//status:go_default_library",
++        "//test/grpc_testing:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null balancer/roundrobin/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ balancer/roundrobin/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,33 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["roundrobin.go"],
++    importpath = "google.golang.org/grpc/balancer/roundrobin",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//balancer:go_default_library",
++        "//balancer/base:go_default_library",
++        "//grpclog:go_default_library",
++        "//internal/grpcrand:go_default_library",
++        "//resolver:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["roundrobin_test.go"],
++    embed = [":go_default_library"],
++    deps = [
++        "//codes:go_default_library",
++        "//grpclog/glogger:go_default_library",
++        "//internal/leakcheck:go_default_library",
++        "//peer:go_default_library",
++        "//resolver:go_default_library",
++        "//resolver/manual:go_default_library",
++        "//status:go_default_library",
++        "//test/grpc_testing:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null balancer/weightedroundrobin/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ balancer/weightedroundrobin/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,9 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["weightedroundrobin.go"],
++    importpath = "google.golang.org/grpc/balancer/weightedroundrobin",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null balancer/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ balancer/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,17 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["balancer.go"],
++    importpath = "google.golang.org/grpc/balancer",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//connectivity:go_default_library",
++        "//credentials:go_default_library",
++        "//internal:go_default_library",
++        "//metadata:go_default_library",
++        "//resolver:go_default_library",
++        "//serviceconfig:go_default_library",
++    ],
++)
++
+diff -N /dev/null benchmark/benchmain/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ benchmark/benchmain/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,27 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/benchmark/benchmain",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//benchmark:go_default_library",
++        "//benchmark/flags:go_default_library",
++        "//benchmark/grpc_testing:go_default_library",
++        "//benchmark/latency:go_default_library",
++        "//benchmark/stats:go_default_library",
++        "//grpclog:go_default_library",
++        "//internal/channelz:go_default_library",
++        "//keepalive:go_default_library",
++        "//test/bufconn:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "benchmain",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null benchmark/benchresult/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ benchmark/benchresult/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,16 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/benchmark/benchresult",
++    visibility = ["//visibility:private"],
++    deps = ["//benchmark/stats:go_default_library"],
++)
++
++go_binary(
++    name = "benchresult",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null benchmark/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ benchmark/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,23 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/benchmark/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//benchmark:go_default_library",
++        "//benchmark/grpc_testing:go_default_library",
++        "//benchmark/stats:go_default_library",
++        "//grpclog:go_default_library",
++        "//internal/syscall:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null benchmark/flags/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ benchmark/flags/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["flags.go"],
++    importpath = "google.golang.org/grpc/benchmark/flags",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["flags_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null benchmark/grpc_testing/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ benchmark/grpc_testing/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,32 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
++
++proto_library(
++    name = "grpc_testing_proto",
++    srcs = [
++        "control.proto",
++        "messages.proto",
++        "payloads.proto",
++        "services.proto",
++        "stats.proto",
++    ],
++    visibility = ["//visibility:public"],
++    deps = ["//:root_proto"],
++)
++
++go_proto_library(
++    name = "grpc_testing_go_proto",
++    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
++    importpath = "google.golang.org/grpc/benchmark/grpc_testing",
++    proto = ":grpc_testing_proto",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
++go_library(
++    name = "go_default_library",
++    embed = [":grpc_testing_go_proto"],
++    importpath = "google.golang.org/grpc/benchmark/grpc_testing",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null benchmark/latency/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ benchmark/latency/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["latency.go"],
++    importpath = "google.golang.org/grpc/benchmark/latency",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["latency_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null benchmark/primitives/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ benchmark/primitives/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,13 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_test")
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "code_string_test.go",
++        "context_test.go",
++        "primitives_test.go",
++        "syncmap_test.go",
++    ],
++    deps = ["//codes:go_default_library"],
++)
++
+diff -N /dev/null benchmark/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ benchmark/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,20 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/benchmark/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//benchmark:go_default_library",
++        "//grpclog:go_default_library",
++        "//internal/syscall:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null benchmark/stats/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ benchmark/stats/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,12 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "histogram.go",
++        "stats.go",
++    ],
++    importpath = "google.golang.org/grpc/benchmark/stats",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null benchmark/worker/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ benchmark/worker/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,31 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "benchmark_client.go",
++        "benchmark_server.go",
++        "main.go",
++    ],
++    importpath = "google.golang.org/grpc/benchmark/worker",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//benchmark:go_default_library",
++        "//benchmark/grpc_testing:go_default_library",
++        "//benchmark/stats:go_default_library",
++        "//codes:go_default_library",
++        "//credentials:go_default_library",
++        "//grpclog:go_default_library",
++        "//internal/syscall:go_default_library",
++        "//status:go_default_library",
++        "//testdata:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "worker",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null benchmark/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ benchmark/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,16 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["benchmark.go"],
++    importpath = "google.golang.org/grpc/benchmark",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//benchmark/grpc_testing:go_default_library",
++        "//codes:go_default_library",
++        "//grpclog:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null binarylog/grpc_binarylog_v1/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ binarylog/grpc_binarylog_v1/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,14 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["binarylog.pb.go"],
++    importpath = "google.golang.org/grpc/binarylog/grpc_binarylog_v1",
++    visibility = ["//visibility:public"],
++    deps = [
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:timestamp_go_proto",
++    ],
++)
++
+diff -N /dev/null channelz/grpc_channelz_v1/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ channelz/grpc_channelz_v1/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,19 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["channelz.pb.go"],
++    importpath = "google.golang.org/grpc/channelz/grpc_channelz_v1",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//codes:go_default_library",
++        "//status:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:any_go_proto",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:timestamp_go_proto",
++        "@io_bazel_rules_go//proto/wkt:wrappers_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null channelz/service/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ channelz/service/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,54 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "func_linux.go",
++        "func_nonlinux.go",
++        "service.go",
++    ],
++    importpath = "google.golang.org/grpc/channelz/service",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//channelz/grpc_channelz_v1:go_default_library",
++        "//codes:go_default_library",
++        "//connectivity:go_default_library",
++        "//credentials:go_default_library",
++        "//internal/channelz:go_default_library",
++        "//status:go_default_library",
++        "@com_github_golang_protobuf//ptypes:go_default_library_gen",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:wrappers_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "service_sktopt_test.go",
++        "service_test.go",
++        "util_sktopt_386_test.go",
++        "util_sktopt_amd64_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//channelz/grpc_channelz_v1:go_default_library",
++        "//connectivity:go_default_library",
++        "//credentials:go_default_library",
++        "//internal/channelz:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@com_github_golang_protobuf//ptypes:go_default_library_gen",
++    ] + select({
++        "@io_bazel_rules_go//go/platform:linux_386": [
++            "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++            "@org_golang_x_sys//unix:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:linux_amd64": [
++            "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++            "@org_golang_x_sys//unix:go_default_library",
++        ],
++        "//conditions:default": [],
++    }),
++)
++
+diff -N /dev/null codes/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ codes/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,19 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "code_string.go",
++        "codes.go",
++    ],
++    importpath = "google.golang.org/grpc/codes",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["codes_test.go"],
++    embed = [":go_default_library"],
++    deps = ["@go_googleapis//google/rpc:code_go_proto"],
++)
++
+diff -N /dev/null connectivity/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ connectivity/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["connectivity.go"],
++    importpath = "google.golang.org/grpc/connectivity",
++    visibility = ["//visibility:public"],
++    deps = ["//grpclog:go_default_library"],
++)
++
+diff -N /dev/null credentials/alts/internal/authinfo/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ credentials/alts/internal/authinfo/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,20 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["authinfo.go"],
++    importpath = "google.golang.org/grpc/credentials/alts/internal/authinfo",
++    visibility = ["//credentials/alts:__subpackages__"],
++    deps = [
++        "//credentials:go_default_library",
++        "//credentials/alts/internal/proto/grpc_gcp:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["authinfo_test.go"],
++    embed = [":go_default_library"],
++    deps = ["//credentials/alts/internal/proto/grpc_gcp:go_default_library"],
++)
++
+diff -N /dev/null credentials/alts/internal/conn/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ credentials/alts/internal/conn/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,31 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "aeadrekey.go",
++        "aes128gcm.go",
++        "aes128gcmrekey.go",
++        "common.go",
++        "counter.go",
++        "record.go",
++        "utils.go",
++    ],
++    importpath = "google.golang.org/grpc/credentials/alts/internal/conn",
++    visibility = ["//credentials/alts:__subpackages__"],
++    deps = ["//credentials/alts/internal:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "aeadrekey_test.go",
++        "aes128gcm_test.go",
++        "aes128gcmrekey_test.go",
++        "counter_test.go",
++        "record_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = ["//credentials/alts/internal:go_default_library"],
++)
++
+diff -N /dev/null credentials/alts/internal/handshaker/service/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ credentials/alts/internal/handshaker/service/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,17 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["service.go"],
++    importpath = "google.golang.org/grpc/credentials/alts/internal/handshaker/service",
++    visibility = ["//credentials/alts:__subpackages__"],
++    deps = ["@org_golang_google_grpc//:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["service_test.go"],
++    embed = [":go_default_library"],
++    deps = ["@org_golang_google_grpc//:go_default_library"],
++)
++
+diff -N /dev/null credentials/alts/internal/handshaker/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ credentials/alts/internal/handshaker/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,30 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["handshaker.go"],
++    importpath = "google.golang.org/grpc/credentials/alts/internal/handshaker",
++    visibility = ["//credentials/alts:__subpackages__"],
++    deps = [
++        "//codes:go_default_library",
++        "//credentials:go_default_library",
++        "//credentials/alts/internal:go_default_library",
++        "//credentials/alts/internal/authinfo:go_default_library",
++        "//credentials/alts/internal/conn:go_default_library",
++        "//credentials/alts/internal/proto/grpc_gcp:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["handshaker_test.go"],
++    embed = [":go_default_library"],
++    deps = [
++        "//credentials/alts/internal:go_default_library",
++        "//credentials/alts/internal/proto/grpc_gcp:go_default_library",
++        "//credentials/alts/internal/testutil:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null credentials/alts/internal/proto/grpc_gcp/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ credentials/alts/internal/proto/grpc_gcp/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,19 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "altscontext.pb.go",
++        "handshaker.pb.go",
++        "transport_security_common.pb.go",
++    ],
++    importpath = "google.golang.org/grpc/credentials/alts/internal/proto/grpc_gcp",
++    visibility = ["//credentials/alts:__subpackages__"],
++    deps = [
++        "//codes:go_default_library",
++        "//status:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null credentials/alts/internal/testutil/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ credentials/alts/internal/testutil/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["testutil.go"],
++    importpath = "google.golang.org/grpc/credentials/alts/internal/testutil",
++    visibility = ["//credentials/alts:__subpackages__"],
++    deps = ["//credentials/alts/internal/conn:go_default_library"],
++)
++
+diff -N /dev/null credentials/alts/internal/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ credentials/alts/internal/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["common.go"],
++    importpath = "google.golang.org/grpc/credentials/alts/internal",
++    visibility = ["//visibility:public"],
++    deps = ["//credentials:go_default_library"],
++)
++
+diff -N /dev/null credentials/alts/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ credentials/alts/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,35 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "alts.go",
++        "utils.go",
++    ],
++    importpath = "google.golang.org/grpc/credentials/alts",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//credentials:go_default_library",
++        "//credentials/alts/internal:go_default_library",
++        "//credentials/alts/internal/handshaker:go_default_library",
++        "//credentials/alts/internal/handshaker/service:go_default_library",
++        "//credentials/alts/internal/proto/grpc_gcp:go_default_library",
++        "//grpclog:go_default_library",
++        "//peer:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "alts_test.go",
++        "utils_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//credentials/alts/internal/proto/grpc_gcp:go_default_library",
++        "//peer:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++    ],
++)
++
+diff -N /dev/null credentials/google/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ credentials/google/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,16 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["google.go"],
++    importpath = "google.golang.org/grpc/credentials/google",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//credentials:go_default_library",
++        "//credentials/alts:go_default_library",
++        "//credentials/oauth:go_default_library",
++        "//grpclog:go_default_library",
++        "//internal:go_default_library",
++    ],
++)
++
+diff -N /dev/null credentials/internal/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ credentials/internal/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["syscallconn.go"],
++    importpath = "google.golang.org/grpc/credentials/internal",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["syscallconn_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null credentials/oauth/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ credentials/oauth/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["oauth.go"],
++    importpath = "google.golang.org/grpc/credentials/oauth",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//credentials:go_default_library",
++        "@org_golang_x_oauth2//:go_default_library",
++        "@org_golang_x_oauth2//google:go_default_library",
++        "@org_golang_x_oauth2//jwt:go_default_library",
++    ],
++)
++
+diff -N /dev/null credentials/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ credentials/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,23 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "credentials.go",
++        "tls13.go",
++    ],
++    importpath = "google.golang.org/grpc/credentials",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//credentials/internal:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["credentials_test.go"],
++    embed = [":go_default_library"],
++    deps = ["//testdata:go_default_library"],
++)
++
+diff -N /dev/null encoding/gzip/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ encoding/gzip/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["gzip.go"],
++    importpath = "google.golang.org/grpc/encoding/gzip",
++    visibility = ["//visibility:public"],
++    deps = ["//encoding:go_default_library"],
++)
++
+diff -N /dev/null encoding/proto/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ encoding/proto/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,27 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["proto.go"],
++    importpath = "google.golang.org/grpc/encoding/proto",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//encoding:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "proto_benchmark_test.go",
++        "proto_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//encoding:go_default_library",
++        "//test/codec_perf:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++    ],
++)
++
+diff -N /dev/null encoding/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ encoding/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,9 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["encoding.go"],
++    importpath = "google.golang.org/grpc/encoding",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/authentication/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/authentication/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,23 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/authentication/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//credentials:go_default_library",
++        "//credentials/oauth:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//testdata:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++        "@org_golang_x_oauth2//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/authentication/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/authentication/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,24 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/authentication/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//credentials:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//metadata:go_default_library",
++        "//status:go_default_library",
++        "//testdata:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/cancellation/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/cancellation/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/cancellation/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/cancellation/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/cancellation/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/cancellation/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/compression/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/compression/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,20 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/compression/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//encoding/gzip:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/compression/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/compression/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,22 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/compression/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//encoding/gzip:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/deadline/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/deadline/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/deadline/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/deadline/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/deadline/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/deadline/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/debugging/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/debugging/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,23 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/debugging/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//channelz/service:go_default_library",
++        "//examples/helloworld/helloworld:go_default_library",
++        "//resolver:go_default_library",
++        "//resolver/manual:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++        "@org_golang_x_net//context:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/debugging/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/debugging/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,22 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/debugging/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//channelz/service:go_default_library",
++        "//examples/helloworld/helloworld:go_default_library",
++        "//internal/grpcrand:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++        "@org_golang_x_net//context:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/encryption/ALTS/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/encryption/ALTS/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,20 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/encryption/ALTS/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//credentials/alts:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/encryption/ALTS/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/encryption/ALTS/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,22 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/encryption/ALTS/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//credentials/alts:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/encryption/TLS/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/encryption/TLS/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/encryption/TLS/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//credentials:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//testdata:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/encryption/TLS/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/encryption/TLS/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,23 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/encryption/TLS/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//credentials:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//status:go_default_library",
++        "//testdata:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/errors/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/errors/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/errors/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//examples/helloworld/helloworld:go_default_library",
++        "//status:go_default_library",
++        "@go_googleapis//google/rpc:errdetails_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/errors/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/errors/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,22 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/errors/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//examples/helloworld/helloworld:go_default_library",
++        "//status:go_default_library",
++        "@go_googleapis//google/rpc:errdetails_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/interceptor/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/interceptor/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,23 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/interceptor/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//credentials:go_default_library",
++        "//credentials/oauth:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//testdata:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++        "@org_golang_x_oauth2//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/interceptor/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/interceptor/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,24 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/interceptor/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//credentials:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//metadata:go_default_library",
++        "//status:go_default_library",
++        "//testdata:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/keepalive/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/keepalive/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,20 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/keepalive/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//examples/features/proto/echo:go_default_library",
++        "//keepalive:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/keepalive/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/keepalive/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,22 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/keepalive/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//keepalive:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/load_balancing/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/load_balancing/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,20 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/load_balancing/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//examples/features/proto/echo:go_default_library",
++        "//resolver:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/load_balancing/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/load_balancing/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/load_balancing/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/metadata/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/metadata/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,20 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/metadata/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//examples/features/proto/echo:go_default_library",
++        "//metadata:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/metadata/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/metadata/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,22 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/metadata/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//metadata:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/multiplex/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/multiplex/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,20 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/multiplex/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//examples/features/proto/echo:go_default_library",
++        "//examples/helloworld/helloworld:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/multiplex/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/multiplex/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,22 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/multiplex/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//examples/helloworld/helloworld:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/name_resolving/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/name_resolving/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,20 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/name_resolving/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//examples/features/proto/echo:go_default_library",
++        "//resolver:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/name_resolving/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/name_resolving/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/name_resolving/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/proto/echo/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/proto/echo/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,24 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
++
++proto_library(
++    name = "echo_proto",
++    srcs = ["echo.proto"],
++    visibility = ["//visibility:public"],
++)
++
++go_proto_library(
++    name = "echo_go_proto",
++    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
++    importpath = "google.golang.org/grpc/examples/features/proto/echo",
++    proto = ":echo_proto",
++    visibility = ["//visibility:public"],
++)
++
++go_library(
++    name = "go_default_library",
++    embed = [":echo_go_proto"],
++    importpath = "google.golang.org/grpc/examples/features/proto/echo",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/proto/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/proto/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,9 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["doc.go"],
++    importpath = "google.golang.org/grpc/examples/features/proto",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/reflection/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/reflection/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,23 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/reflection/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//examples/helloworld/helloworld:go_default_library",
++        "//reflection:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/features/wait_for_ready/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/features/wait_for_ready/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/features/wait_for_ready",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//examples/features/proto/echo:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "wait_for_ready",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/helloworld/greeter_client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/helloworld/greeter_client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,19 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/helloworld/greeter_client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//examples/helloworld/helloworld:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "greeter_client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/helloworld/greeter_server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/helloworld/greeter_server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,19 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/examples/helloworld/greeter_server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//examples/helloworld/helloworld:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "greeter_server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/helloworld/helloworld/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/helloworld/helloworld/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,24 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
++
++proto_library(
++    name = "helloworld_proto",
++    srcs = ["helloworld.proto"],
++    visibility = ["//visibility:public"],
++)
++
++go_proto_library(
++    name = "helloworld_go_proto",
++    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
++    importpath = "google.golang.org/grpc/examples/helloworld/helloworld",
++    proto = ":helloworld_proto",
++    visibility = ["//visibility:public"],
++)
++
++go_library(
++    name = "go_default_library",
++    embed = [":helloworld_go_proto"],
++    importpath = "google.golang.org/grpc/examples/helloworld/helloworld",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/helloworld/mock_helloworld/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/helloworld/mock_helloworld/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,26 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["hw_mock.go"],
++    importpath = "google.golang.org/grpc/examples/helloworld/mock_helloworld",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//examples/helloworld/helloworld:go_default_library",
++        "@com_github_golang_mock//gomock:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++        "@org_golang_x_net//context:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["hw_mock_test.go"],
++    embed = [":go_default_library"],
++    deps = [
++        "//examples/helloworld/helloworld:go_default_library",
++        "@com_github_golang_mock//gomock:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++    ],
++)
++
+diff -N /dev/null examples/route_guide/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/route_guide/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["client.go"],
++    importpath = "google.golang.org/grpc/examples/route_guide/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//credentials:go_default_library",
++        "//examples/route_guide/routeguide:go_default_library",
++        "//testdata:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/route_guide/mock_routeguide/BUILD.baze
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/route_guide/mock_routeguide/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,27 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["rg_mock.go"],
++    importpath = "google.golang.org/grpc/examples/route_guide/mock_routeguide",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//examples/route_guide/routeguide:go_default_library",
++        "//metadata:go_default_library",
++        "@com_github_golang_mock//gomock:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++        "@org_golang_x_net//context:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["rg_mock_test.go"],
++    embed = [":go_default_library"],
++    deps = [
++        "//examples/route_guide/routeguide:go_default_library",
++        "@com_github_golang_mock//gomock:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++    ],
++)
++
+diff -N /dev/null examples/route_guide/routeguide/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/route_guide/routeguide/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,24 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
++
++proto_library(
++    name = "routeguide_proto",
++    srcs = ["route_guide.proto"],
++    visibility = ["//visibility:public"],
++)
++
++go_proto_library(
++    name = "routeguide_go_proto",
++    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
++    importpath = "google.golang.org/grpc/examples/route_guide/routeguide",
++    proto = ":routeguide_proto",
++    visibility = ["//visibility:public"],
++)
++
++go_library(
++    name = "go_default_library",
++    embed = [":routeguide_go_proto"],
++    importpath = "google.golang.org/grpc/examples/route_guide/routeguide",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null examples/route_guide/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ examples/route_guide/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,22 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["server.go"],
++    importpath = "google.golang.org/grpc/examples/route_guide/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//credentials:go_default_library",
++        "//examples/route_guide/routeguide:go_default_library",
++        "//testdata:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null grpclog/glogger/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ grpclog/glogger/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,13 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["glogger.go"],
++    importpath = "google.golang.org/grpc/grpclog/glogger",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//grpclog:go_default_library",
++        "@com_github_golang_glog//:go_default_library",
++    ],
++)
++
+diff -N /dev/null grpclog/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ grpclog/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,19 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "grpclog.go",
++        "logger.go",
++        "loggerv2.go",
++    ],
++    importpath = "google.golang.org/grpc/grpclog",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["loggerv2_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null health/grpc_health_v1/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ health/grpc_health_v1/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["health.pb.go"],
++    importpath = "google.golang.org/grpc/health/grpc_health_v1",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//codes:go_default_library",
++        "//status:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null health/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ health/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,37 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "client.go",
++        "server.go",
++    ],
++    importpath = "google.golang.org/grpc/health",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//codes:go_default_library",
++        "//connectivity:go_default_library",
++        "//grpclog:go_default_library",
++        "//health/grpc_health_v1:go_default_library",
++        "//internal:go_default_library",
++        "//internal/backoff:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "client_test.go",
++        "server_internal_test.go",
++        "server_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//connectivity:go_default_library",
++        "//health/grpc_health_v1:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null internal/backoff/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/backoff/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["backoff.go"],
++    importpath = "google.golang.org/grpc/internal/backoff",
++    visibility = ["//:__subpackages__"],
++    deps = ["//internal/grpcrand:go_default_library"],
++)
++
+diff -N /dev/null internal/balancerload/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/balancerload/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["load.go"],
++    importpath = "google.golang.org/grpc/internal/balancerload",
++    visibility = ["//:__subpackages__"],
++    deps = ["//metadata:go_default_library"],
++)
++
+diff -N /dev/null internal/binarylog/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/binarylog/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,48 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "binarylog.go",
++        "binarylog_testutil.go",
++        "env_config.go",
++        "method_logger.go",
++        "sink.go",
++        "util.go",
++    ],
++    importpath = "google.golang.org/grpc/internal/binarylog",
++    visibility = ["//:__subpackages__"],
++    deps = [
++        "//binarylog/grpc_binarylog_v1:go_default_library",
++        "//grpclog:go_default_library",
++        "//metadata:go_default_library",
++        "//status:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@com_github_golang_protobuf//ptypes:go_default_library_gen",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "binarylog_end2end_test.go",
++        "binarylog_test.go",
++        "env_config_test.go",
++        "method_logger_test.go",
++        "regexp_test.go",
++        "util_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//binarylog/grpc_binarylog_v1:go_default_library",
++        "//codes:go_default_library",
++        "//grpclog:go_default_library",
++        "//metadata:go_default_library",
++        "//stats/grpc_testing:go_default_library",
++        "//status:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null internal/channelz/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/channelz/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,38 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "funcs.go",
++        "types.go",
++        "types_linux.go",
++        "types_nonlinux.go",
++        "util_linux.go",
++        "util_nonlinux.go",
++    ],
++    importpath = "google.golang.org/grpc/internal/channelz",
++    visibility = ["//:__subpackages__"],
++    deps = [
++        "//connectivity:go_default_library",
++        "//credentials:go_default_library",
++        "//grpclog:go_default_library",
++    ] + select({
++        "@io_bazel_rules_go//go/platform:linux": [
++            "@org_golang_x_sys//unix:go_default_library",
++        ],
++        "//conditions:default": [],
++    }),
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["util_test.go"],
++    embed = [":go_default_library"],
++    deps = select({
++        "@io_bazel_rules_go//go/platform:linux": [
++            "@org_golang_x_sys//unix:go_default_library",
++        ],
++        "//conditions:default": [],
++    }),
++)
++
+diff -N /dev/null internal/envconfig/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/envconfig/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,9 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["envconfig.go"],
++    importpath = "google.golang.org/grpc/internal/envconfig",
++    visibility = ["//:__subpackages__"],
++)
++
+diff -N /dev/null internal/grpcrand/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/grpcrand/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,9 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["grpcrand.go"],
++    importpath = "google.golang.org/grpc/internal/grpcrand",
++    visibility = ["//:__subpackages__"],
++)
++
+diff -N /dev/null internal/grpcsync/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/grpcsync/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["event.go"],
++    importpath = "google.golang.org/grpc/internal/grpcsync",
++    visibility = ["//:__subpackages__"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["event_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null internal/grpctest/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/grpctest/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,18 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["grpctest.go"],
++    importpath = "google.golang.org/grpc/internal/grpctest",
++    visibility = ["//:__subpackages__"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "example_test.go",
++        "grpctest_test.go",
++    ],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null internal/leakcheck/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/leakcheck/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["leakcheck.go"],
++    importpath = "google.golang.org/grpc/internal/leakcheck",
++    visibility = ["//:__subpackages__"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["leakcheck_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null internal/syscall/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/syscall/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,49 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "syscall_linux.go",
++        "syscall_nonlinux.go",
++    ],
++    importpath = "google.golang.org/grpc/internal/syscall",
++    visibility = ["//:__subpackages__"],
++    deps = select({
++        "@io_bazel_rules_go//go/platform:android": [
++            "//grpclog:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:darwin": [
++            "//grpclog:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:dragonfly": [
++            "//grpclog:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:freebsd": [
++            "//grpclog:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:linux": [
++            "//grpclog:go_default_library",
++            "@org_golang_x_sys//unix:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:nacl": [
++            "//grpclog:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:netbsd": [
++            "//grpclog:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:openbsd": [
++            "//grpclog:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:plan9": [
++            "//grpclog:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:solaris": [
++            "//grpclog:go_default_library",
++        ],
++        "@io_bazel_rules_go//go/platform:windows": [
++            "//grpclog:go_default_library",
++        ],
++        "//conditions:default": [],
++    }),
++)
++
+diff -N /dev/null internal/testutils/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/testutils/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,31 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "pipe_listener.go",
++        "status_equal.go",
++    ],
++    importpath = "google.golang.org/grpc/internal/testutils",
++    visibility = ["//:__subpackages__"],
++    deps = [
++        "//status:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "pipe_listener_test.go",
++        "status_equal_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//codes:go_default_library",
++        "//status:go_default_library",
++        "@go_googleapis//google/rpc:status_go_proto",
++        "@io_bazel_rules_go//proto/wkt:any_go_proto",
++    ],
++)
++
+diff -N /dev/null internal/transport/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/transport/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,63 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "bdp_estimator.go",
++        "controlbuf.go",
++        "defaults.go",
++        "flowcontrol.go",
++        "handler_server.go",
++        "http2_client.go",
++        "http2_server.go",
++        "http_util.go",
++        "log.go",
++        "transport.go",
++    ],
++    importpath = "google.golang.org/grpc/internal/transport",
++    visibility = ["//:__subpackages__"],
++    deps = [
++        "//codes:go_default_library",
++        "//credentials:go_default_library",
++        "//grpclog:go_default_library",
++        "//internal:go_default_library",
++        "//internal/channelz:go_default_library",
++        "//internal/grpcrand:go_default_library",
++        "//internal/syscall:go_default_library",
++        "//keepalive:go_default_library",
++        "//metadata:go_default_library",
++        "//peer:go_default_library",
++        "//stats:go_default_library",
++        "//status:go_default_library",
++        "//tap:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@go_googleapis//google/rpc:status_go_proto",
++        "@org_golang_x_net//http2:go_default_library",
++        "@org_golang_x_net//http2/hpack:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "handler_server_test.go",
++        "http_util_test.go",
++        "transport_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//codes:go_default_library",
++        "//internal/leakcheck:go_default_library",
++        "//internal/syscall:go_default_library",
++        "//internal/testutils:go_default_library",
++        "//keepalive:go_default_library",
++        "//metadata:go_default_library",
++        "//status:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@go_googleapis//google/rpc:errdetails_go_proto",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@org_golang_x_net//http2:go_default_library",
++        "@org_golang_x_net//http2/hpack:go_default_library",
++    ],
++)
++
+diff -N /dev/null internal/wrr/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/wrr/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "edf.go",
++        "random.go",
++        "wrr.go",
++    ],
++    importpath = "google.golang.org/grpc/internal/wrr",
++    visibility = ["//:__subpackages__"],
++    deps = ["//internal/grpcrand:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["wrr_test.go"],
++    embed = [":go_default_library"],
++    deps = ["@com_github_google_go_cmp//cmp:go_default_library"],
++)
++
+diff -N /dev/null internal/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["internal.go"],
++    importpath = "google.golang.org/grpc/internal",
++    visibility = ["//visibility:public"],
++    deps = ["//connectivity:go_default_library"],
++)
++
+diff -N /dev/null interop/alts/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ interop/alts/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["client.go"],
++    importpath = "google.golang.org/grpc/interop/alts/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//credentials/alts:go_default_library",
++        "//grpclog:go_default_library",
++        "//interop/grpc_testing:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null interop/alts/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ interop/alts/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,23 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["server.go"],
++    importpath = "google.golang.org/grpc/interop/alts/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//credentials/alts:go_default_library",
++        "//grpclog:go_default_library",
++        "//interop:go_default_library",
++        "//interop/grpc_testing:go_default_library",
++        "//tap:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null interop/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ interop/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,28 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["client.go"],
++    importpath = "google.golang.org/grpc/interop/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//balancer/grpclb:go_default_library",
++        "//credentials:go_default_library",
++        "//credentials/alts:go_default_library",
++        "//credentials/google:go_default_library",
++        "//credentials/oauth:go_default_library",
++        "//grpclog:go_default_library",
++        "//interop:go_default_library",
++        "//interop/grpc_testing:go_default_library",
++        "//resolver:go_default_library",
++        "//testdata:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null interop/fake_grpclb/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ interop/fake_grpclb/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,25 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["fake_grpclb.go"],
++    importpath = "google.golang.org/grpc/interop/fake_grpclb",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//balancer/grpclb/grpc_lb_v1:go_default_library",
++        "//codes:go_default_library",
++        "//credentials:go_default_library",
++        "//credentials/alts:go_default_library",
++        "//grpclog:go_default_library",
++        "//status:go_default_library",
++        "//testdata:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "fake_grpclb",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null interop/grpc_testing/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ interop/grpc_testing/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,24 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
++
++proto_library(
++    name = "grpc_testing_proto",
++    srcs = ["test.proto"],
++    visibility = ["//visibility:public"],
++)
++
++go_proto_library(
++    name = "grpc_testing_go_proto",
++    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
++    importpath = "google.golang.org/grpc/interop/grpc_testing",
++    proto = ":grpc_testing_proto",
++    visibility = ["//visibility:public"],
++)
++
++go_library(
++    name = "go_default_library",
++    embed = [":grpc_testing_go_proto"],
++    importpath = "google.golang.org/grpc/interop/grpc_testing",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null interop/http2/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ interop/http2/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,23 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["negative_http2_client.go"],
++    importpath = "google.golang.org/grpc/interop/http2",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//grpclog:go_default_library",
++        "//interop:go_default_library",
++        "//interop/grpc_testing:go_default_library",
++        "//status:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "http2",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null interop/server/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ interop/server/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,24 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["server.go"],
++    importpath = "google.golang.org/grpc/interop/server",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//credentials:go_default_library",
++        "//credentials/alts:go_default_library",
++        "//grpclog:go_default_library",
++        "//interop:go_default_library",
++        "//interop/grpc_testing:go_default_library",
++        "//testdata:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "server",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null interop/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ interop/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,20 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["test_utils.go"],
++    importpath = "google.golang.org/grpc/interop",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//codes:go_default_library",
++        "//grpclog:go_default_library",
++        "//interop/grpc_testing:go_default_library",
++        "//metadata:go_default_library",
++        "//status:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++        "@org_golang_x_oauth2//:go_default_library",
++        "@org_golang_x_oauth2//google:go_default_library",
++    ],
++)
++
+diff -N /dev/null keepalive/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ keepalive/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,9 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["keepalive.go"],
++    importpath = "google.golang.org/grpc/keepalive",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null metadata/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ metadata/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["metadata.go"],
++    importpath = "google.golang.org/grpc/metadata",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["metadata_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null naming/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ naming/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,19 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "dns_resolver.go",
++        "naming.go",
++    ],
++    importpath = "google.golang.org/grpc/naming",
++    visibility = ["//visibility:public"],
++    deps = ["//grpclog:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["dns_resolver_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null peer/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ peer/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["peer.go"],
++    importpath = "google.golang.org/grpc/peer",
++    visibility = ["//visibility:public"],
++    deps = ["//credentials:go_default_library"],
++)
++
+diff -N /dev/null reflection/grpc_reflection_v1alpha/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ reflection/grpc_reflection_v1alpha/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,24 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
++
++proto_library(
++    name = "grpc_reflection_v1alpha_proto",
++    srcs = ["reflection.proto"],
++    visibility = ["//visibility:public"],
++)
++
++go_proto_library(
++    name = "grpc_reflection_v1alpha_go_proto",
++    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
++    importpath = "google.golang.org/grpc/reflection/grpc_reflection_v1alpha",
++    proto = ":grpc_reflection_v1alpha_proto",
++    visibility = ["//visibility:public"],
++)
++
++go_library(
++    name = "go_default_library",
++    embed = [":grpc_reflection_v1alpha_go_proto"],
++    importpath = "google.golang.org/grpc/reflection/grpc_reflection_v1alpha",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null reflection/grpc_testing/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ reflection/grpc_testing/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,31 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
++
++proto_library(
++    name = "grpc_testing_proto",
++    srcs = [
++        "proto2.proto",
++        "proto2_ext.proto",
++        "proto2_ext2.proto",
++        "test.proto",
++    ],
++    visibility = ["//visibility:public"],
++    deps = ["//:root_proto"],
++)
++
++go_proto_library(
++    name = "grpc_testing_go_proto",
++    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
++    importpath = "google.golang.org/grpc/reflection/grpc_testing",
++    proto = ":grpc_testing_proto",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
++go_library(
++    name = "go_default_library",
++    embed = [":grpc_testing_go_proto"],
++    importpath = "google.golang.org/grpc/reflection/grpc_testing",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null reflection/grpc_testingv3/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ reflection/grpc_testingv3/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,24 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
++
++proto_library(
++    name = "grpc_testingv3_proto",
++    srcs = ["testv3.proto"],
++    visibility = ["//visibility:public"],
++)
++
++go_proto_library(
++    name = "grpc_testingv3_go_proto",
++    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
++    importpath = "google.golang.org/grpc/reflection/grpc_testingv3",
++    proto = ":grpc_testingv3_proto",
++    visibility = ["//visibility:public"],
++)
++
++go_library(
++    name = "go_default_library",
++    embed = [":grpc_testingv3_go_proto"],
++    importpath = "google.golang.org/grpc/reflection/grpc_testingv3",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null reflection/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ reflection/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,31 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["serverreflection.go"],
++    importpath = "google.golang.org/grpc/reflection",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//codes:go_default_library",
++        "//reflection/grpc_reflection_v1alpha:go_default_library",
++        "//status:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:descriptor_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["serverreflection_test.go"],
++    embed = [":go_default_library"],
++    deps = [
++        "//reflection/grpc_reflection_v1alpha:go_default_library",
++        "//reflection/grpc_testing:go_default_library",
++        "//reflection/grpc_testingv3:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:descriptor_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null resolver/dns/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ resolver/dns/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,25 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["dns_resolver.go"],
++    importpath = "google.golang.org/grpc/resolver/dns",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//grpclog:go_default_library",
++        "//internal/backoff:go_default_library",
++        "//internal/grpcrand:go_default_library",
++        "//resolver:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["dns_resolver_test.go"],
++    embed = [":go_default_library"],
++    deps = [
++        "//internal/leakcheck:go_default_library",
++        "//resolver:go_default_library",
++    ],
++)
++
+diff -N /dev/null resolver/manual/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ resolver/manual/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["manual.go"],
++    importpath = "google.golang.org/grpc/resolver/manual",
++    visibility = ["//visibility:public"],
++    deps = ["//resolver:go_default_library"],
++)
++
+diff -N /dev/null resolver/passthrough/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ resolver/passthrough/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["passthrough.go"],
++    importpath = "google.golang.org/grpc/resolver/passthrough",
++    visibility = ["//visibility:public"],
++    deps = ["//resolver:go_default_library"],
++)
++
+diff -N /dev/null resolver/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ resolver/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["resolver.go"],
++    importpath = "google.golang.org/grpc/resolver",
++    visibility = ["//visibility:public"],
++    deps = ["//serviceconfig:go_default_library"],
++)
++
+diff -N /dev/null serviceconfig/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ serviceconfig/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["serviceconfig.go"],
++    importpath = "google.golang.org/grpc/serviceconfig",
++    visibility = ["//visibility:public"],
++    deps = ["//internal:go_default_library"],
++)
++
+diff -N /dev/null stats/grpc_testing/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ stats/grpc_testing/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,24 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
++
++proto_library(
++    name = "grpc_testing_proto",
++    srcs = ["test.proto"],
++    visibility = ["//visibility:public"],
++)
++
++go_proto_library(
++    name = "grpc_testing_go_proto",
++    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
++    importpath = "google.golang.org/grpc/stats/grpc_testing",
++    proto = ":grpc_testing_proto",
++    visibility = ["//visibility:public"],
++)
++
++go_library(
++    name = "go_default_library",
++    embed = [":grpc_testing_go_proto"],
++    importpath = "google.golang.org/grpc/stats/grpc_testing",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null stats/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ stats/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,26 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "handlers.go",
++        "stats.go",
++    ],
++    importpath = "google.golang.org/grpc/stats",
++    visibility = ["//visibility:public"],
++    deps = ["//metadata:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["stats_test.go"],
++    embed = [":go_default_library"],
++    deps = [
++        "//metadata:go_default_library",
++        "//stats/grpc_testing:go_default_library",
++        "//status:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null status/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ status/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,36 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["status.go"],
++    importpath = "google.golang.org/grpc/status",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//codes:go_default_library",
++        "//internal:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@com_github_golang_protobuf//ptypes:go_default_library_gen",
++        "@go_googleapis//google/rpc:status_go_proto",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "status_ext_test.go",
++        "status_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//codes:go_default_library",
++        "//test/grpc_testing:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@com_github_golang_protobuf//ptypes:go_default_library_gen",
++        "@go_googleapis//google/rpc:code_go_proto",
++        "@go_googleapis//google/rpc:errdetails_go_proto",
++        "@go_googleapis//google/rpc:status_go_proto",
++        "@io_bazel_rules_go//proto/wkt:any_go_proto",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++    ],
++)
++
+diff -N /dev/null stress/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ stress/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,26 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/stress/client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//codes:go_default_library",
++        "//credentials:go_default_library",
++        "//grpclog:go_default_library",
++        "//interop:go_default_library",
++        "//interop/grpc_testing:go_default_library",
++        "//status:go_default_library",
++        "//stress/grpc_testing:go_default_library",
++        "//testdata:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null stress/grpc_testing/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ stress/grpc_testing/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,24 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
++
++proto_library(
++    name = "grpc_testing_proto",
++    srcs = ["metrics.proto"],
++    visibility = ["//visibility:public"],
++)
++
++go_proto_library(
++    name = "grpc_testing_go_proto",
++    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
++    importpath = "google.golang.org/grpc/stress/grpc_testing",
++    proto = ":grpc_testing_proto",
++    visibility = ["//visibility:public"],
++)
++
++go_library(
++    name = "go_default_library",
++    embed = [":grpc_testing_go_proto"],
++    importpath = "google.golang.org/grpc/stress/grpc_testing",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null stress/metrics_client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ stress/metrics_client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,20 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "google.golang.org/grpc/stress/metrics_client",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//grpclog:go_default_library",
++        "//stress/grpc_testing:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "metrics_client",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null tap/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ tap/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,9 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["tap.go"],
++    importpath = "google.golang.org/grpc/tap",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null test/bufconn/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ test/bufconn/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["bufconn.go"],
++    importpath = "google.golang.org/grpc/test/bufconn",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["bufconn_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null test/codec_perf/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ test/codec_perf/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,23 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
++
++proto_library(
++    name = "codec_perf_proto",
++    srcs = ["perf.proto"],
++    visibility = ["//visibility:public"],
++)
++
++go_proto_library(
++    name = "codec_perf_go_proto",
++    importpath = "google.golang.org/grpc/test/codec_perf",
++    proto = ":codec_perf_proto",
++    visibility = ["//visibility:public"],
++)
++
++go_library(
++    name = "go_default_library",
++    embed = [":codec_perf_go_proto"],
++    importpath = "google.golang.org/grpc/test/codec_perf",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null test/go_vet/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ test/go_vet/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["vet.go"],
++    importpath = "google.golang.org/grpc/test/go_vet",
++    visibility = ["//visibility:private"],
++)
++
++go_binary(
++    name = "go_vet",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null test/grpc_testing/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ test/grpc_testing/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,24 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
++
++proto_library(
++    name = "grpc_testing_proto",
++    srcs = ["test.proto"],
++    visibility = ["//visibility:public"],
++)
++
++go_proto_library(
++    name = "grpc_testing_go_proto",
++    compilers = ["@io_bazel_rules_go//proto:go_grpc"],
++    importpath = "google.golang.org/grpc/test/grpc_testing",
++    proto = ":grpc_testing_proto",
++    visibility = ["//visibility:public"],
++)
++
++go_library(
++    name = "go_default_library",
++    embed = [":grpc_testing_go_proto"],
++    importpath = "google.golang.org/grpc/test/grpc_testing",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null test/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ test/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,76 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "race.go",
++        "rawConnWrapper.go",
++        "servertester.go",
++    ],
++    importpath = "google.golang.org/grpc/test",
++    visibility = ["//visibility:public"],
++    deps = [
++        "@org_golang_x_net//http2:go_default_library",
++        "@org_golang_x_net//http2/hpack:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "balancer_test.go",
++        "channelz_linux_go110_test.go",
++        "channelz_test.go",
++        "context_canceled_test.go",
++        "creds_test.go",
++        "end2end_test.go",
++        "goaway_test.go",
++        "gracefulstop_test.go",
++        "healthcheck_test.go",
++        "retry_test.go",
++        "stream_cleanup_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//balancer:go_default_library",
++        "//balancer/grpclb:go_default_library",
++        "//balancer/roundrobin:go_default_library",
++        "//codes:go_default_library",
++        "//connectivity:go_default_library",
++        "//credentials:go_default_library",
++        "//encoding:go_default_library",
++        "//encoding/gzip:go_default_library",
++        "//grpclog:go_default_library",
++        "//grpclog/glogger:go_default_library",
++        "//health:go_default_library",
++        "//health/grpc_health_v1:go_default_library",
++        "//internal:go_default_library",
++        "//internal/balancerload:go_default_library",
++        "//internal/channelz:go_default_library",
++        "//internal/envconfig:go_default_library",
++        "//internal/grpcsync:go_default_library",
++        "//internal/grpctest:go_default_library",
++        "//internal/leakcheck:go_default_library",
++        "//internal/testutils:go_default_library",
++        "//internal/transport:go_default_library",
++        "//keepalive:go_default_library",
++        "//metadata:go_default_library",
++        "//peer:go_default_library",
++        "//resolver:go_default_library",
++        "//resolver/manual:go_default_library",
++        "//resolver/passthrough:go_default_library",
++        "//serviceconfig:go_default_library",
++        "//stats:go_default_library",
++        "//status:go_default_library",
++        "//tap:go_default_library",
++        "//test/grpc_testing:go_default_library",
++        "//testdata:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@go_googleapis//google/rpc:status_go_proto",
++        "@io_bazel_rules_go//proto/wkt:any_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++        "@org_golang_x_net//http2:go_default_library",
++        "@org_golang_x_net//http2/hpack:go_default_library",
++    ],
++)
++
+diff -N /dev/null testdata/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ testdata/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,9 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["testdata.go"],
++    importpath = "google.golang.org/grpc/testdata",
++    visibility = ["//visibility:public"],
++)
++
+diff -N /dev/null xds/experimental/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/experimental/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["xds_experimental.go"],
++    importpath = "google.golang.org/grpc/xds/experimental",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//balancer:go_default_library",
++        "//resolver:go_default_library",
++        "//xds/internal/balancer:go_default_library",
++        "//xds/internal/resolver:go_default_library",
++    ],
++)
++
+diff -N /dev/null xds/internal/balancer/edsbalancer/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/balancer/edsbalancer/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,58 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "balancergroup.go",
++        "edsbalancer.go",
++        "util.go",
++    ],
++    importpath = "google.golang.org/grpc/xds/internal/balancer/edsbalancer",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//balancer:go_default_library",
++        "//balancer/base:go_default_library",
++        "//balancer/roundrobin:go_default_library",
++        "//balancer/weightedroundrobin:go_default_library",
++        "//codes:go_default_library",
++        "//connectivity:go_default_library",
++        "//grpclog:go_default_library",
++        "//internal/wrr:go_default_library",
++        "//resolver:go_default_library",
++        "//status:go_default_library",
++        "//xds/internal:go_default_library",
++        "//xds/internal/balancer/lrs:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/eds:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/endpoint/endpoint:go_default_library",
++        "//xds/internal/proto/envoy/type/percent:go_default_library",
++        "//xds/internal/proto/udpa/data/orca/v1/orca_load_report:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "balancergroup_test.go",
++        "edsbalancer_test.go",
++        "test_util_test.go",
++        "util_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//balancer:go_default_library",
++        "//balancer/roundrobin:go_default_library",
++        "//connectivity:go_default_library",
++        "//internal/wrr:go_default_library",
++        "//resolver:go_default_library",
++        "//xds/internal:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/address:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/eds:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/endpoint/endpoint:go_default_library",
++        "//xds/internal/proto/envoy/type/percent:go_default_library",
++        "//xds/internal/proto/udpa/data/orca/v1/orca_load_report:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:wrappers_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null xds/internal/balancer/lrs/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/balancer/lrs/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,39 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["lrs.go"],
++    importpath = "google.golang.org/grpc/xds/internal/balancer/lrs",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//grpclog:go_default_library",
++        "//internal/backoff:go_default_library",
++        "//xds/internal:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/endpoint/load_report:go_default_library",
++        "//xds/internal/proto/envoy/service/load_stats/v2/lrs:go_default_library",
++        "@com_github_golang_protobuf//ptypes:go_default_library_gen",
++        "@io_bazel_rules_go//proto/wkt:struct_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["lrs_test.go"],
++    embed = [":go_default_library"],
++    deps = [
++        "//codes:go_default_library",
++        "//status:go_default_library",
++        "//xds/internal:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/endpoint/load_report:go_default_library",
++        "//xds/internal/proto/envoy/service/load_stats/v2/lrs:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@com_github_google_go_cmp//cmp:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:struct_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null xds/internal/balancer/orca/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/balancer/orca/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,27 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["orca.go"],
++    importpath = "google.golang.org/grpc/xds/internal/balancer/orca",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//grpclog:go_default_library",
++        "//internal/balancerload:go_default_library",
++        "//metadata:go_default_library",
++        "//xds/internal/proto/udpa/data/orca/v1/orca_load_report:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["orca_test.go"],
++    embed = [":go_default_library"],
++    deps = [
++        "//metadata:go_default_library",
++        "//xds/internal/proto/udpa/data/orca/v1/orca_load_report:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++    ],
++)
++
+diff -N /dev/null xds/internal/balancer/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/balancer/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,70 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "xds.go",
++        "xds_client.go",
++    ],
++    importpath = "google.golang.org/grpc/xds/internal/balancer",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//balancer:go_default_library",
++        "//connectivity:go_default_library",
++        "//grpclog:go_default_library",
++        "//internal/backoff:go_default_library",
++        "//internal/channelz:go_default_library",
++        "//resolver:go_default_library",
++        "//serviceconfig:go_default_library",
++        "//xds/internal:go_default_library",
++        "//xds/internal/balancer/edsbalancer:go_default_library",
++        "//xds/internal/balancer/lrs:go_default_library",
++        "//xds/internal/client:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/cds:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/discovery:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/eds:go_default_library",
++        "//xds/internal/proto/envoy/service/discovery/v2/ads:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@com_github_golang_protobuf//ptypes:go_default_library_gen",
++        "@io_bazel_rules_go//proto/wkt:struct_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "xds_client_test.go",
++        "xds_lrs_test.go",
++        "xds_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//balancer:go_default_library",
++        "//codes:go_default_library",
++        "//connectivity:go_default_library",
++        "//internal/grpctest:go_default_library",
++        "//internal/leakcheck:go_default_library",
++        "//resolver:go_default_library",
++        "//status:go_default_library",
++        "//xds/internal:go_default_library",
++        "//xds/internal/balancer/lrs:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/cds:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/address:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/discovery:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/eds:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/endpoint/endpoint:go_default_library",
++        "//xds/internal/proto/envoy/service/discovery/v2/ads:go_default_library",
++        "//xds/internal/proto/envoy/service/load_stats/v2/lrs:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@com_github_google_go_cmp//cmp:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:any_go_proto",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:struct_go_proto",
++        "@io_bazel_rules_go//proto/wkt:wrappers_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null xds/internal/client/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/client/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,28 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["helper.go"],
++    importpath = "google.golang.org/grpc/xds/internal/client",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//credentials/google:go_default_library",
++        "//grpclog:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/config_source:go_default_library",
++        "@com_github_golang_protobuf//jsonpb:go_default_library_gen",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["helper_test.go"],
++    embed = [":go_default_library"],
++    deps = [
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:struct_go_proto",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/api/v2/auth/cert/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/api/v2/auth/cert/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,16 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["cert.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/api/v2/auth/cert",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/config_source:go_default_library",
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:wrappers_go_proto",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/api/v2/cds/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/api/v2/cds/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,31 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["cds.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/api/v2/cds",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/envoy/api/v2/auth/cert:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/cluster/circuit_breaker:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/cluster/outlier_detection:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/address:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/config_source:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/health_check:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/protocol:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/discovery:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/eds:go_default_library",
++        "//xds/internal/proto/envoy/type/percent:go_default_library",
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@go_googleapis//google/api:annotations_go_proto",
++        "@io_bazel_rules_go//proto/wkt:any_go_proto",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:struct_go_proto",
++        "@io_bazel_rules_go//proto/wkt:wrappers_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++        "@org_golang_x_net//context:go_default_library",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/api/v2/cluster/circuit_breaker/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/api/v2/cluster/circuit_breaker/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,14 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["circuit_breaker.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/api/v2/cluster/circuit_breaker",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:wrappers_go_proto",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/api/v2/cluster/outlier_detection/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/api/v2/cluster/outlier_detection/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["outlier_detection.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/api/v2/cluster/outlier_detection",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:wrappers_go_proto",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/api/v2/core/address/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/api/v2/core/address/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["address.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/api/v2/core/address",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:wrappers_go_proto",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/api/v2/core/base/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/api/v2/core/base/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,17 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["base.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/api/v2/core/base",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/envoy/type/percent:go_default_library",
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:any_go_proto",
++        "@io_bazel_rules_go//proto/wkt:struct_go_proto",
++        "@io_bazel_rules_go//proto/wkt:wrappers_go_proto",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/api/v2/core/config_source/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/api/v2/core/config_source/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,16 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["config_source.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/api/v2/core/config_source",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/envoy/api/v2/core/grpc_service:go_default_library",
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:wrappers_go_proto",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/api/v2/core/grpc_service/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/api/v2/core/grpc_service/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,18 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["grpc_service.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/api/v2/core/grpc_service",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:any_go_proto",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:empty_go_proto",
++        "@io_bazel_rules_go//proto/wkt:struct_go_proto",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/api/v2/core/health_check/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/api/v2/core/health_check/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,19 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["health_check.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/api/v2/core/health_check",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "//xds/internal/proto/envoy/type/range:go_default_library",
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:any_go_proto",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:struct_go_proto",
++        "@io_bazel_rules_go//proto/wkt:wrappers_go_proto",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/api/v2/core/protocol/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/api/v2/core/protocol/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["protocol.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/api/v2/core/protocol",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:wrappers_go_proto",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/api/v2/discovery/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/api/v2/discovery/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["discovery.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/api/v2/discovery",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@go_googleapis//google/rpc:status_go_proto",
++        "@io_bazel_rules_go//proto/wkt:any_go_proto",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/api/v2/eds/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/api/v2/eds/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["eds.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/api/v2/eds",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/envoy/api/v2/discovery:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/endpoint/endpoint:go_default_library",
++        "//xds/internal/proto/envoy/type/percent:go_default_library",
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@go_googleapis//google/api:annotations_go_proto",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:wrappers_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++        "@org_golang_x_net//context:go_default_library",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/api/v2/endpoint/endpoint/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/api/v2/endpoint/endpoint/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,17 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["endpoint.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/api/v2/endpoint/endpoint",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/envoy/api/v2/core/address:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/health_check:go_default_library",
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:wrappers_go_proto",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/api/v2/endpoint/load_report/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/api/v2/endpoint/load_report/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,17 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["load_report.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/api/v2/endpoint/load_report",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/envoy/api/v2/core/address:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:struct_go_proto",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/service/discovery/v2/ads/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/service/discovery/v2/ads/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["ads.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/service/discovery/v2/ads",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/envoy/api/v2/discovery:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++        "@org_golang_x_net//context:go_default_library",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/service/load_stats/v2/lrs/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/service/load_stats/v2/lrs/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,18 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["lrs.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/service/load_stats/v2/lrs",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/endpoint/load_report:go_default_library",
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++        "@org_golang_x_net//context:go_default_library",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/type/percent/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/type/percent/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,13 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["percent.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/type/percent",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/envoy/type/range/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/envoy/type/range/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["range.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/envoy/type/range",
++    visibility = ["//xds:__subpackages__"],
++    deps = ["@com_github_golang_protobuf//proto:go_default_library"],
++)
++
+diff -N /dev/null xds/internal/proto/udpa/data/orca/v1/orca_load_report/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/udpa/data/orca/v1/orca_load_report/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,13 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["orca_load_report.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/udpa/data/orca/v1/orca_load_report",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/udpa/service/orca/v1/orca/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/udpa/service/orca/v1/orca/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,17 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["orca.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/udpa/service/orca/v1/orca",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//xds/internal/proto/udpa/data/orca/v1/orca_load_report:go_default_library",
++        "//xds/internal/proto/validate:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@org_golang_google_grpc//:go_default_library",
++        "@org_golang_x_net//context:go_default_library",
++    ],
++)
++
+diff -N /dev/null xds/internal/proto/validate/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/proto/validate/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["validate.pb.go"],
++    importpath = "google.golang.org/grpc/xds/internal/proto/validate",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@io_bazel_rules_go//proto/wkt:descriptor_go_proto",
++        "@io_bazel_rules_go//proto/wkt:duration_go_proto",
++        "@io_bazel_rules_go//proto/wkt:timestamp_go_proto",
++    ],
++)
++
+diff -N /dev/null xds/internal/resolver/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/resolver/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,29 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["xds_resolver.go"],
++    importpath = "google.golang.org/grpc/xds/internal/resolver",
++    visibility = ["//xds:__subpackages__"],
++    deps = [
++        "//internal:go_default_library",
++        "//resolver:go_default_library",
++        "//serviceconfig:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["xds_resolver_test.go"],
++    embed = [":go_default_library"],
++    deps = [
++        "//balancer:go_default_library",
++        "//connectivity:go_default_library",
++        "//resolver:go_default_library",
++        "//serviceconfig:go_default_library",
++        "//xds/internal:go_default_library",
++        "@org_golang_google_grpc//:go_default_library",
++    ],
++)
++
+diff -N /dev/null xds/internal/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ xds/internal/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,27 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "const.go",
++        "internal.go",
++    ],
++    importpath = "google.golang.org/grpc/xds/internal",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//balancer:go_default_library",
++        "//serviceconfig:go_default_library",
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["internal_test.go"],
++    embed = [":go_default_library"],
++    deps = [
++        "//xds/internal/proto/envoy/api/v2/core/base:go_default_library",
++        "@com_github_google_go_cmp//cmp:go_default_library",
++    ],
++)
++
+diff -N /dev/null BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,110 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "backoff.go",
++        "balancer.go",
++        "balancer_conn_wrappers.go",
++        "balancer_v1_wrapper.go",
++        "call.go",
++        "clientconn.go",
++        "codec.go",
++        "dialoptions.go",
++        "doc.go",
++        "interceptor.go",
++        "picker_wrapper.go",
++        "pickfirst.go",
++        "preloader.go",
++        "proxy.go",
++        "resolver_conn_wrapper.go",
++        "rpc_util.go",
++        "server.go",
++        "service_config.go",
++        "stream.go",
++        "trace.go",
++        "version.go",
++    ],
++    importpath = "google.golang.org/grpc",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//balancer:go_default_library",
++        "//balancer/roundrobin:go_default_library",
++        "//codes:go_default_library",
++        "//connectivity:go_default_library",
++        "//credentials:go_default_library",
++        "//encoding:go_default_library",
++        "//encoding/proto:go_default_library",
++        "//grpclog:go_default_library",
++        "//internal:go_default_library",
++        "//internal/backoff:go_default_library",
++        "//internal/balancerload:go_default_library",
++        "//internal/binarylog:go_default_library",
++        "//internal/channelz:go_default_library",
++        "//internal/envconfig:go_default_library",
++        "//internal/grpcrand:go_default_library",
++        "//internal/grpcsync:go_default_library",
++        "//internal/transport:go_default_library",
++        "//keepalive:go_default_library",
++        "//metadata:go_default_library",
++        "//naming:go_default_library",
++        "//peer:go_default_library",
++        "//resolver:go_default_library",
++        "//resolver/dns:go_default_library",
++        "//resolver/passthrough:go_default_library",
++        "//serviceconfig:go_default_library",
++        "//stats:go_default_library",
++        "//status:go_default_library",
++        "//tap:go_default_library",
++        "@org_golang_x_net//trace:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "balancer_switching_test.go",
++        "balancer_test.go",
++        "call_test.go",
++        "clientconn_state_transition_test.go",
++        "clientconn_test.go",
++        "codec_test.go",
++        "grpc_test.go",
++        "picker_wrapper_test.go",
++        "pickfirst_test.go",
++        "proxy_test.go",
++        "resolver_conn_wrapper_test.go",
++        "rpc_util_test.go",
++        "server_test.go",
++        "service_config_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//balancer:go_default_library",
++        "//balancer/roundrobin:go_default_library",
++        "//codes:go_default_library",
++        "//connectivity:go_default_library",
++        "//credentials:go_default_library",
++        "//encoding:go_default_library",
++        "//encoding/proto:go_default_library",
++        "//grpclog/glogger:go_default_library",
++        "//internal:go_default_library",
++        "//internal/backoff:go_default_library",
++        "//internal/grpctest:go_default_library",
++        "//internal/leakcheck:go_default_library",
++        "//internal/testutils:go_default_library",
++        "//internal/transport:go_default_library",
++        "//keepalive:go_default_library",
++        "//naming:go_default_library",
++        "//resolver:go_default_library",
++        "//resolver/manual:go_default_library",
++        "//resolver/passthrough:go_default_library",
++        "//serviceconfig:go_default_library",
++        "//status:go_default_library",
++        "//test/codec_perf:go_default_library",
++        "//testdata:go_default_library",
++        "@com_github_golang_protobuf//proto:go_default_library",
++        "@org_golang_x_net//http2:go_default_library",
++    ],
++)
++

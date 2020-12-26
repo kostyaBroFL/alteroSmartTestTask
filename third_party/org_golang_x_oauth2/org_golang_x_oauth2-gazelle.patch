@@ -1,0 +1,593 @@
+diff -N /dev/null amazon/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ amazon/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["amazon.go"],
++    importpath = "golang.org/x/oauth2/amazon",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null bitbucket/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ bitbucket/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["bitbucket.go"],
++    importpath = "golang.org/x/oauth2/bitbucket",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null cern/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ cern/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["cern.go"],
++    importpath = "golang.org/x/oauth2/cern",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null clientcredentials/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ clientcredentials/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,20 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["clientcredentials.go"],
++    importpath = "golang.org/x/oauth2/clientcredentials",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//:go_default_library",
++        "//internal:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["clientcredentials_test.go"],
++    embed = [":go_default_library"],
++    deps = ["//internal:go_default_library"],
++)
++
+diff -N /dev/null facebook/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ facebook/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["facebook.go"],
++    importpath = "golang.org/x/oauth2/facebook",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null fitbit/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ fitbit/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["fitbit.go"],
++    importpath = "golang.org/x/oauth2/fitbit",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null foursquare/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ foursquare/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["foursquare.go"],
++    importpath = "golang.org/x/oauth2/foursquare",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null github/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ github/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["github.go"],
++    importpath = "golang.org/x/oauth2/github",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null gitlab/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gitlab/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["gitlab.go"],
++    importpath = "golang.org/x/oauth2/gitlab",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null google/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ google/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,41 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "appengine.go",
++        "appengine_gen2_flex.go",
++        "default.go",
++        "doc.go",
++        "google.go",
++        "jwt.go",
++        "sdk.go",
++    ],
++    importpath = "golang.org/x/oauth2/google",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//:go_default_library",
++        "//internal:go_default_library",
++        "//jws:go_default_library",
++        "//jwt:go_default_library",
++        "@com_google_cloud_go//compute/metadata:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "example_test.go",
++        "google_test.go",
++        "jwt_test.go",
++        "sdk_test.go",
++    ],
++    data = glob(["testdata/**"]),
++    embed = [":go_default_library"],
++    deps = [
++        "//:go_default_library",
++        "//jws:go_default_library",
++        "//jwt:go_default_library",
++    ],
++)
++
+diff -N /dev/null heroku/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ heroku/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["heroku.go"],
++    importpath = "golang.org/x/oauth2/heroku",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null hipchat/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ hipchat/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,13 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["hipchat.go"],
++    importpath = "golang.org/x/oauth2/hipchat",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//:go_default_library",
++        "//clientcredentials:go_default_library",
++    ],
++)
++
+diff -N /dev/null instagram/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ instagram/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["instagram.go"],
++    importpath = "golang.org/x/oauth2/instagram",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null internal/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ internal/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,21 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "oauth2.go",
++        "token.go",
++        "transport.go",
++    ],
++    importpath = "golang.org/x/oauth2/internal",
++    visibility = ["//visibility:public"],
++    deps = ["@org_golang_x_net//context/ctxhttp:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["token_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null jira/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ jira/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,20 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["jira.go"],
++    importpath = "golang.org/x/oauth2/jira",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["jira_test.go"],
++    embed = [":go_default_library"],
++    deps = [
++        "//:go_default_library",
++        "//jws:go_default_library",
++    ],
++)
++
+diff -N /dev/null jws/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ jws/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["jws.go"],
++    importpath = "golang.org/x/oauth2/jws",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = ["jws_test.go"],
++    embed = [":go_default_library"],
++)
++
+diff -N /dev/null jwt/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ jwt/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,27 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["jwt.go"],
++    importpath = "golang.org/x/oauth2/jwt",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//:go_default_library",
++        "//internal:go_default_library",
++        "//jws:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "example_test.go",
++        "jwt_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = [
++        "//:go_default_library",
++        "//jws:go_default_library",
++    ],
++)
++
+diff -N /dev/null kakao/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ kakao/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["kakao.go"],
++    importpath = "golang.org/x/oauth2/kakao",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null linkedin/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ linkedin/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["linkedin.go"],
++    importpath = "golang.org/x/oauth2/linkedin",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null mailchimp/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ mailchimp/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["mailchimp.go"],
++    importpath = "golang.org/x/oauth2/mailchimp",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null mailru/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ mailru/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["mailru.go"],
++    importpath = "golang.org/x/oauth2/mailru",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null mediamath/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ mediamath/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["mediamath.go"],
++    importpath = "golang.org/x/oauth2/mediamath",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null microsoft/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ microsoft/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["microsoft.go"],
++    importpath = "golang.org/x/oauth2/microsoft",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null nokiahealth/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ nokiahealth/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["nokiahealth.go"],
++    importpath = "golang.org/x/oauth2/nokiahealth",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null odnoklassniki/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ odnoklassniki/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["odnoklassniki.go"],
++    importpath = "golang.org/x/oauth2/odnoklassniki",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null paypal/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ paypal/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["paypal.go"],
++    importpath = "golang.org/x/oauth2/paypal",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null slack/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ slack/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["slack.go"],
++    importpath = "golang.org/x/oauth2/slack",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null spotify/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ spotify/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["spotify.go"],
++    importpath = "golang.org/x/oauth2/spotify",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null stackoverflow/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ stackoverflow/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["stackoverflow.go"],
++    importpath = "golang.org/x/oauth2/stackoverflow",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null twitch/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ twitch/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["twitch.go"],
++    importpath = "golang.org/x/oauth2/twitch",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null uber/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ uber/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["uber.go"],
++    importpath = "golang.org/x/oauth2/uber",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null vk/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ vk/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["vk.go"],
++    importpath = "golang.org/x/oauth2/vk",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null yahoo/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ yahoo/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["yahoo.go"],
++    importpath = "golang.org/x/oauth2/yahoo",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null yandex/BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ yandex/BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,10 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["yandex.go"],
++    importpath = "golang.org/x/oauth2/yandex",
++    visibility = ["//visibility:public"],
++    deps = ["//:go_default_library"],
++)
++
+diff -N /dev/null BUILD.bazel
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ BUILD.bazel	1970-01-01 00:00:00.000000000 +0000
+@@ -0,0 +1,26 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "oauth2.go",
++        "token.go",
++        "transport.go",
++    ],
++    importpath = "golang.org/x/oauth2",
++    visibility = ["//visibility:public"],
++    deps = ["//internal:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "example_test.go",
++        "oauth2_test.go",
++        "token_test.go",
++        "transport_test.go",
++    ],
++    embed = [":go_default_library"],
++    deps = ["//internal:go_default_library"],
++)
++
