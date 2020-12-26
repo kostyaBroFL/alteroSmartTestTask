@@ -1,0 +1,114 @@
+diff -urN a/BUILD.bazel b/BUILD.bazel
+--- a/BUILD.bazel	1970-01-01 01:00:00.000000000 +0100
++++ b/BUILD.bazel	2018-11-27 15:38:19.354309218 +0000
+@@ -0,0 +1,45 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
++load("@rules_proto//proto:defs.bzl", "proto_library")
++
++proto_library(
++    name = "validator_proto",
++    srcs = ["validator.proto"],
++    visibility = ["//visibility:public"],
++    deps = ["@com_google_protobuf//:descriptor_proto"],
++)
++
++go_proto_library(
++    name = "validator",
++    importpath = "github.com/mwitkow/go-proto-validators",
++    proto = ":validator_proto",
++    visibility = ["//visibility:private"],
++    compilers = ["@io_bazel_rules_go//proto:go_proto"],
++)
++
++# In the production application code, we use the golang/protobuf/protoc-gen-g to compile the proto-files.
++# Therefore, we must resolve dependencies on validator.pb.go compiled by the same compiler.
++go_library(
++    name = "go_default_library",
++    embed = [":validator"],
++    importpath = "github.com/mwitkow/go-proto-validators",
++    visibility = ["//visibility:public"],
++    srcs = ["helper.go"],
++)
++
++# The source code of the plugin requires the validator.proto file to be compiled using the gogo compiler.
++# Here we use the compiled version of validator.proto from the repository,
++# but only for plugin compilation.
++go_library(
++    name = "plugin_validator",
++    srcs = [
++        "helper.go",
++         "validator.pb.go",
++    ],
++    importpath = "github.com/mwitkow/go-proto-validators",
++    visibility = ["//visibility:public"],
++    deps = [
++        "@com_github_gogo_protobuf//proto:go_default_library",
++        "@com_github_gogo_protobuf//protoc-gen-gogo/descriptor:go_default_library",
++    ],
++)
+diff -urN a/plugin/BUILD.bazel b/plugin/BUILD.bazel
+--- a/plugin/BUILD.bazel	1970-01-01 01:00:00.000000000 +0100
++++ b/plugin/BUILD.bazel	2018-11-27 15:14:24.473920236 +0000
+@@ -0,0 +1,16 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["plugin.go"],
++    importpath = "github.com/mwitkow/go-proto-validators/plugin",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//:plugin_validator",
++        "@com_github_gogo_protobuf//gogoproto:go_default_library",
++        "@com_github_gogo_protobuf//proto:go_default_library",
++        "@com_github_gogo_protobuf//protoc-gen-gogo/descriptor:go_default_library",
++        "@com_github_gogo_protobuf//protoc-gen-gogo/generator:go_default_library",
++        "@com_github_gogo_protobuf//vanity:go_default_library",
++    ],
++)
+diff -urN a/protoc-gen-govalidators/BUILD.bazel b/protoc-gen-govalidators/BUILD.bazel
+--- a/protoc-gen-govalidators/BUILD.bazel	1970-01-01 01:00:00.000000000 +0100
++++ b/protoc-gen-govalidators/BUILD.bazel	2018-11-27 15:14:24.473920236 +0000
+@@ -0,0 +1,19 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "github.com/mwitkow/go-proto-validators/protoc-gen-govalidators",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//plugin:go_default_library",
++        "@com_github_gogo_protobuf//proto:go_default_library",
++        "@com_github_gogo_protobuf//protoc-gen-gogo/generator:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "protoc-gen-govalidators",
++    embed = [":go_default_library"],
++    visibility = ["//visibility:public"],
++)
+diff -urN a/test/gogo/BUILD.bazel b/test/gogo/BUILD.bazel
+--- a/test/gogo/BUILD.bazel	1970-01-01 01:00:00.000000000 +0100
++++ b/test/gogo/BUILD.bazel	2018-11-27 15:14:24.473920236 +0000
+@@ -0,0 +1,7 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_test")
++
++go_test(
++    name = "go_default_test",
++    srcs = ["validator_test.go"],
++    deps = ["@com_github_stretchr_testify//assert:go_default_library"],
++)
+diff -urN a/test/golang/BUILD.bazel b/test/golang/BUILD.bazel
+--- a/test/golang/BUILD.bazel	1970-01-01 01:00:00.000000000 +0100
++++ b/test/golang/BUILD.bazel	2018-11-27 15:14:24.473920236 +0000
+@@ -0,0 +1,7 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_test")
++
++go_test(
++    name = "go_default_test",
++    srcs = ["validator_test.go"],
++    deps = ["@com_github_stretchr_testify//assert:go_default_library"],
++)
