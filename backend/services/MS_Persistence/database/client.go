@@ -1,40 +1,11 @@
-package main
+package database
 
 import (
 	"context"
-	"fmt"
 	// _ "github.com/jackc/pgx/v4"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"os"
 )
-
-func main() {
-	id, err := NewClient().GetDeviceId(context.Background(), &GetDeviceIdReq{
-		Name: "dsf",
-	})
-	fmt.Printf("id %d err %+v\n", id, err)
-
-	id, err = NewClient().GetDeviceId(context.Background(), &GetDeviceIdReq{
-		Name: "dsf",
-	})
-	fmt.Printf("id %d err %+v\n", id, err)
-
-	err = NewClient().InsertDeviceData(context.Background(), &InsertDeviceDataReq{
-		DeviceId:         1,
-		Data:             23423423,
-		TimestampSeconds: 234,
-		TimestampNanos:   32423,
-	})
-	fmt.Printf("err %+v\n", err)
-	err = NewClient().InsertDeviceData(context.Background(), &InsertDeviceDataReq{
-		DeviceId:         1,
-		Data:             3423657,
-		TimestampSeconds: 234,
-		TimestampNanos:   32423,
-	})
-	fmt.Printf("err %+v\n", err)
-}
 
 var getDeviceQuery = `insert into device(name) 
 	values (:device_name) 
@@ -53,12 +24,7 @@ func (c *client) Close() error {
 	return c.db.Close()
 }
 
-func NewClient() *client {
-	db, err := sqlx.Connect("postgres", "host=localhost user=postgres password=qwerty dbname=ms_persistence sslmode=disable")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
-	}
+func NewClient(db *sqlx.DB) *client {
 	return &client{db: db}
 }
 
