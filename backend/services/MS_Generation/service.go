@@ -78,7 +78,11 @@ func (s *service) RemoveDevice(
 	return &api.RemoveDeviceResponse{}, nil
 }
 
-func (s *service) runGeneratorWithContext(ctx context.Context, device *api.Device, dataChan chan<- *api.DeviceData) {
+func (s *service) runGeneratorWithContext(
+	ctx context.Context,
+	device *api.Device,
+	dataChan chan<- *api.DeviceData,
+) {
 
 	ticker := time.NewTicker(1000 / time.Duration(device.GetFrequency()) * time.Millisecond)
 	done := make(chan struct{})

@@ -1,47 +1,10 @@
 syntax = "proto3";
 
-option go_package = ".;ms_generation";
+package ms_generation_common;
+option go_package = ".;ms_generation_common";
 
-import "validator.proto";
 import "google/protobuf/timestamp.proto";
-
-// MsGeneration is the service that generates the date
-// by simulating multiple devices.
-service MsGeneration {
-    rpc AddDevice (AddDeviceRequest) returns (AddDeviceResponse);
-    rpc RemoveDevice (RemoveDeviceRequest) returns (RemoveDeviceResponse);
-}
-
-// AddDeviceRequest is the request message for AddDevice method.
-message AddDeviceRequest {
-    // Device is device to add.
-   Device device = 1 [(validator.field) = {
-        msg_exists: true
-    }];
-}
-
-// AddDeviceResponse is the response message for AddDevice method.
-message AddDeviceResponse {
-    AddDeviceStatus status = 1;
-}
-
-message RemoveDeviceRequest {
-    DeviceId device_id = 1 [(validator.field) = {
-        msg_exists: true
-    }];
-}
-// todo docs
-
-message RemoveDeviceResponse {}
-
-enum AddDeviceStatus {
-    UNDEFINED = 0;
-    SUCCESS = 1;
-    DEVICE_IS_EXISTS = 2;
-}
-
-// TODO: я пытался то что ниже пренести в отдельный файл,
-// но не ввышло в короткое время
+import "validator.proto";
 
 // Device is the message to describe information about a specific device.
 message Device {
