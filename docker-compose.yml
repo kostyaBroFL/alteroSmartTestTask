@@ -1,0 +1,36 @@
+version: '3.1'
+
+volumes:
+  ms_persistence_db_volume:
+
+services:
+  ms_persistence_db:
+    container_name: ms_persistence_db
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=ms_persistence
+    volumes:
+      - ms_persistence_db_volume:/var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
+  ms_persistence_service:
+    container_name: ms_persistence_service
+    image: ms_persistence_service
+    build:
+      context: .
+      dockerfile: ./backend/services/MS_Persistence/Dockerfile
+    ports:
+      - 8203:8203
+    entrypoint:
+      - GRPC_PORT=8200
+      - REST_PORT=8203
+      - LOG_AS_JSON=true
+      - LOG_LEVEL=5
+      - POSTGRES_HOST=localhost
+      - POSTGRES_PORT=5432
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DATABASE_NAME=ms_persistence
