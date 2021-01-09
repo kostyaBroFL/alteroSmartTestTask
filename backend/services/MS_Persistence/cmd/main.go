@@ -1,8 +1,6 @@
 package main
 
 import (
-	db "alteroSmartTestTask/common/database"
-	"alteroSmartTestTask/common/log"
 	"context"
 	"flag"
 	"fmt"
@@ -17,10 +15,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	ms_persistence "alteroSmartTestTask/backend/services/MS_Persistence"
 	api "alteroSmartTestTask/backend/services/MS_Persistence/common/api"
 	db_client "alteroSmartTestTask/backend/services/MS_Persistence/database"
+	ms_persistence "alteroSmartTestTask/backend/services/MS_Persistence/server"
+	db "alteroSmartTestTask/common/database"
 	"alteroSmartTestTask/common/flagenv"
+	"alteroSmartTestTask/common/log"
 	log_context "alteroSmartTestTask/common/log/context"
 )
 

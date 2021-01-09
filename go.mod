@@ -14,6 +14,8 @@ require (
 	github.com/lib/pq v1.3.0
 	github.com/mwitkow/go-proto-validators v0.3.2
 	github.com/sirupsen/logrus v1.4.2
+	github.com/stretchr/testify v1.6.1
 	google.golang.org/grpc v1.34.0
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.0.1 // indirect
 	google.golang.org/protobuf v1.25.0
 )

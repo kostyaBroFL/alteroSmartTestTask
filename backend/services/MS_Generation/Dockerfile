@@ -4,13 +4,14 @@ FROM golang:1.15.6-buster
 
 ENV PATH $PATH:/gopath/bin
 ENV GOPATH /gopath
+ENV GO111MODULE on
 
 RUN mkdir -p /protoc && \
     cd /protoc  && \
     apt update -y  && \
     apt install wget autoconf automake libtool curl make g++ unzip tar  && \
-    wget https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protobuf-all-3.14.0.tar.gz  && \
-    tar -xvzf protobuf-all-3.14.0.tar.gz  && \
+    wget https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protoc-3.14.0-linux-x86_64.zip  && \
+    unzip protoc-3.14.0-linux-x86_64  && \
     cd protobuf-3.14.0  && \
     ./autogen.sh  && \
     ./configure  && \
@@ -19,7 +20,7 @@ RUN mkdir -p /protoc && \
     ldconfig && \
     mkdir -p /gopath/bin && \
     mkdir -p /gopath/pkg && \
-    mkdir -p /gopath/src
+    mkdir -p /gopath/src && \
     echo "Installing protobuf" && \
     go get github.com/golang/protobuf/protoc-gen-go@v1.4.3 && \
     go install github.com/golang/protobuf/protoc-gen-go && \

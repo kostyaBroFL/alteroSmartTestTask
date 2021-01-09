@@ -1,0 +1,8 @@
+### macOS ###
+.DS_Store
+### JetBrains ###
+.idea
+gopath
+*.pb.go
+*.pb.gw.go
+*.validator.pb.go

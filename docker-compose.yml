@@ -1,36 +1,67 @@
 version: '3.1'
 
-volumes:
-  ms_persistence_db_volume:
+#volumes:
+#  ms_persistence_db_volume:
+
+networks:
+  ms_persistence:
+    driver: bridge
 
 services:
   ms_persistence_db:
     container_name: ms_persistence_db
-    image: postgres
+    image: postgres:13.1
+    command: postgres -c 'max_connections=1024'
     restart: always
     environment:
       - POSTGRES_PASSWORD=secret
       - POSTGRES_USER=postgres
       - POSTGRES_DB=ms_persistence
-    volumes:
-      - ms_persistence_db_volume:/var/lib/postgresql/data
+    networks:
+      - ms_persistence
+#    volumes:
+#      - ms_persistence_db_volume:/var/lib/postgresql/data
     ports:
-      - ${POSTGRES_PORT:-5432}:5432
+      - 5433:5432
+
+  ms_persistence_db_migration:
+    build:
+      context: .
+      dockerfile: ./backend/services/MS_Persistence/migrations/Dockerfile
+    image: ms_persistence_db_migration
+    container_name: ms_persistence_db_migration
+    environment:
+      - POSTGRES_HOST=host.docker.internal
+      - POSTGRES_PORT=5433
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DATABASE_NAME=ms_persistence
+    networks:
+      - ms_persistence
+    depends_on:
+      - ms_persistence_db
+
   ms_persistence_service:
     container_name: ms_persistence_service
     image: ms_persistence_service
+  #    command: ls
     build:
       context: .
       dockerfile: ./backend/services/MS_Persistence/Dockerfile
     ports:
       - 8203:8203
-    entrypoint:
+    environment:
       - GRPC_PORT=8200
       - REST_PORT=8203
       - LOG_AS_JSON=true
       - LOG_LEVEL=5
-      - POSTGRES_HOST=localhost
-      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=host.docker.internal
+      - POSTGRES_PORT=5433
       - POSTGRES_USERNAME=postgres
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DATABASE_NAME=ms_persistence
+    networks:
+      - ms_persistence
+    depends_on:
+      - ms_persistence_db
+      - ms_persistence_db_migration
