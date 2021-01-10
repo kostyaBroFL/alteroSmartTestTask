@@ -11,18 +11,30 @@ import "google/protobuf/timestamp.proto";
 // by simulating multiple devices.
 service MsPersistence {
     rpc SaveData (SaveDataRequest) returns (SaveDataResponse);
+    rpc GetData (GetDataRequest) returns (GetDataResponse);
 }
 
 // SaveDataRequest is the request message for SaveData method.
 message SaveDataRequest {
     // DeviceData is the data received from device.
-    DeviceData deviceData = 1 [(validator.field) = {
+    DeviceData device_data = 1 [(validator.field) = {
         msg_exists: true
     }];
 }
 
 // SaveDataResponse is the response message for SaveData method.
 message SaveDataResponse {}
+
+message GetDataRequest {
+    int32 limit = 1;
+    DeviceId device_id = 2 [(validator.field) = {
+        msg_exists: true
+    }];
+}
+
+message GetDataResponse {
+    repeated DeviceData device_data = 1;
+}
 
 //todo
 // DeviceData is the data that the device sends.

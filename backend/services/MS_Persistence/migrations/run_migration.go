@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	fmt.Println("AAAAAA")
 	postgresConnection := database.MustGetNewPostgresConnectionUseFlags()
 	listOfMigration := readAllFilesWithUpMigration()
 	for i, migration := range listOfMigration {

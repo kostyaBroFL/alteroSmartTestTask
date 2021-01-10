@@ -1,41 +1,24 @@
 FROM golang:1.15.6-buster
-
-ENV PATH $PATH:/gopath/bin
-ENV GOPATH /gopath
-
+ENV PATH $PATH:/go/bin
 RUN mkdir -p /protoc && \
     cd /protoc  && \
     apt update -y  && \
     apt install wget autoconf automake libtool curl make g++ unzip tar -y && \
-    wget https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protobuf-all-3.14.0.tar.gz  && \
-    tar -xvzf protobuf-all-3.14.0.tar.gz  && \
-    cd protobuf-3.14.0  && \
-    ./autogen.sh  && \
-    ./configure  && \
-    make  && \
-    make install  && \
-    ldconfig && \
-    mkdir -p /gopath/bin && \
-    mkdir -p /gopath/pkg && \
-    mkdir -p /gopath/src && \
-    echo "Installing protobuf" && \
-    go get github.com/golang/protobuf/protoc-gen-go@v1.4.3 && \
+    wget https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protoc-3.14.0-linux-x86_64.zip  && \
+    unzip protoc-3.14.0-linux-x86_64 -d /usr/local
+# gopath /go
+WORKDIR /usr/local/go/src/alteroSmartTestTask
+COPY . .
+RUN go mod download && \
     go install github.com/golang/protobuf/protoc-gen-go && \
-    echo "Installing grpc" && \
-    go get google.golang.org/grpc@v1.34.0 && \
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc && \
-    echo "Installing gRPC->RESTful API middleware" && \
-    go get github.com/grpc-ecosystem/grpc-gateway@v1 && \
     go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway && \
     go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger && \
-    echo "Installing mwitkow/go-proto-validators" && \
-    go get -u github.com/mwitkow/go-proto-validators/protoc-gen-govalidators@v0.3.2
+    go install github.com/mwitkow/go-proto-validators/protoc-gen-govalidators && \
+    ./build.sh && \
+    go build -o ms_persistence_start backend/services/MS_Persistence/cmd/main.go && \
+    chmod +x ms_persistence_start
 
-WORKDIR /gopath/src/alteroSmartTestTask
-COPY . .
+ENTRYPOINT ["./ms_persistence_start"]
 
-RUN ./build.sh && \
-    go build -o ms_persistence_start \
-    backend/services/MS_Persistence/cmd/main.go
-
-ENTRYPOINT ["/gopath/src/alteroSmartTestTask/ms_persistence_start"]
+# todo multistage
