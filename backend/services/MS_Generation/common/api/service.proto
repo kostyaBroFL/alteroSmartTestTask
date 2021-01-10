@@ -50,7 +50,7 @@ message Device {
         msg_exists: true
     }];
     // Frequency it is how many times the device transmits data per second.
-    double frequency = 2;
+    int32 frequency = 2;
 }
 
 // DeviceData is the data that the device sends.

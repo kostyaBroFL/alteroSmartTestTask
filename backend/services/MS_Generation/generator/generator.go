@@ -29,7 +29,7 @@ func (g *generator) CreateDevice(
 	g.wg.Add(1)
 	go func() {
 		defer g.wg.Done()
-		contextDevice, cancel := context.WithCancel(
+		_, cancel := context.WithCancel(
 			log_context.WithLogger(ctx,
 				log_context.FromContext(ctx).
 					WithField("device_name", device.GetDeviceId().GetName()),
