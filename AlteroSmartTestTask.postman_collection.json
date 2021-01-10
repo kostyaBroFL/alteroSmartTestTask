@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "SaveData",
+			"name": "MsPersistance/SaveData example",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -31,6 +31,99 @@
 					"path": [
 						"MsPersistence",
 						"SaveData"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "MsPersistance/GetData example",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"limit\": 100,\n    \"device_id\": {\n        \"name\": \"test_device_1\"\n    }\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8203/MsPersistence/GetData",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8203",
+					"path": [
+						"MsPersistence",
+						"GetData"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "MsGeneration/AddDevice example",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"device\": {\n        \"device_id\": {\n            \"name\": \"test_device_1\"\n        },\n        \"frequency\": 50\n    }\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8204/MsGeneration/AddDevice",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8204",
+					"path": [
+						"MsGeneration",
+						"AddDevice"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "MsGeneration/RemoveDevice example",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"device_id\": {\n        \"name\": \"test_device_1\"\n    }\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8204/MsGeneration/RemoveDevice",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8204",
+					"path": [
+						"MsGeneration",
+						"RemoveDevice"
 					]
 				}
 			},
