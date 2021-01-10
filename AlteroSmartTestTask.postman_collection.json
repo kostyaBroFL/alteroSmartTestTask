@@ -1,0 +1,41 @@
+{
+	"info": {
+		"_postman_id": "884aa2e1-af38-4cd3-a078-fc784d078e99",
+		"name": "AlteroSmartTestTask",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "SaveData",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"device_data\": {\n        \"device_id\": {\n            \"name\": \"test_device_1\"\n        },\n        \"data\": 0.3,\n        \"timestamp\": \"2021-01-09T22:49:34Z\"\n    }\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8203/MsPersistence/SaveData",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8203",
+					"path": [
+						"MsPersistence",
+						"SaveData"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
