@@ -5,7 +5,6 @@ import (
 	log_context "alteroSmartTestTask/common/log/context"
 	"alteroSmartTestTask/common/syncgo"
 	"context"
-	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	"sync"
@@ -15,7 +14,7 @@ import (
 
 var (
 	testDeviceName      = "testDeviceName"
-	testDeviceFrequency = int32(10)
+	testDeviceFrequency = int32(500)
 	testDevice          = &api.Device{
 		DeviceId: &api.DeviceId{
 			Name: testDeviceName,
@@ -44,25 +43,37 @@ func (g *generatorTest) SetupTest() {
 }
 
 func (g *generatorTest) TestCreateDeviceFreq() {
-	deviceDataChan := g.generator.CreateDevice(g.ctx, testDevice)
-	endTimerChan := time.NewTimer(time.Second + 10*time.Millisecond).C
+	deviceDataChan, err := g.generator.CreateDevice(g.ctx, testDevice)
+	g.Require().Nil(err)
+	endTimerChan := time.NewTimer(251 * time.Millisecond).C
 	var counter int32
 	syncgo.GoWG(g.wg, func() {
 		for {
 			select {
 			case <-deviceDataChan:
 				counter += 1
-				fmt.Printf("+1\n")
 			case <-endTimerChan:
-				fmt.Println("cancel")
 				g.cancel()
 				return
 			}
 		}
 	})
 	g.wg.Wait()
-	g.Assert().Equal(testDeviceFrequency, counter)
+	g.Assert().Equal(testDeviceFrequency/4, counter)
+	err = g.generator.RemoveDevice(g.ctx, testDevice)
+	g.Require().Nil(err)
+	g.generator.Wait()
 }
+
+// func (g *generatorTest) TestCreateDeviceDuplicateError() {
+// 	_, err := g.generator.CreateDevice(g.ctx, testDevice)
+// 	g.Require().Nil(err)
+// 	_, err = g.generator.CreateDevice(g.ctx, testDevice)
+// 	g.Assert().Contains(err, "already exists")
+// 	err = g.generator.RemoveDevice(g.ctx, testDevice)
+// 	g.Require().Nil(err)
+// 	g.generator.Wait()
+// }
 
 func TestGenerator(t *testing.T) {
 	suite.Run(t, new(generatorTest))
