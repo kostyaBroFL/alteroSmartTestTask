@@ -9,8 +9,8 @@ import (
 	_ "net/http/pprof"
 	"strings"
 
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
+	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpcvalidator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -22,56 +22,65 @@ import (
 	msperapi "alteroSmartTestTask/backend/services/MS_Persistence/common/api"
 	"alteroSmartTestTask/common/flagenv"
 	"alteroSmartTestTask/common/log"
-	log_context "alteroSmartTestTask/common/log/context"
+	logcontext "alteroSmartTestTask/common/log/context"
 )
 
-var gRpcPortEnvName = "GRPC_PORT"
-var gRpcPortFlag = flag.Int(
-	"groc_port",
-	0,
-	"This is the port from which server will listen grpc.",
+var (
+	gRpcPortEnvName = "GRPC_PORT"
+	gRpcPortFlag    = flag.Int(
+		"grpc_port",
+		0,
+		"This is the port from which server will listen grpc.",
+	)
+
+	restApiPortEnvName = "REST_PORT"
+	restApiPortFlag    = flag.Int(
+		"rest_port",
+		0,
+		"This is the port for REST API (grpc mirror) listening.",
+	)
+
+	msPersistenceGrpcHostEnvName = "MS_PERSISTENCE_GRPC_HOST"
+	msPersistenceGrpcHostFlag    = flag.String(
+		"ms_persistence_grpc_host",
+		"",
+		"This is the host for grpc connection to ms persistence server.",
+	)
+
+	pprofPortEnvName = "PPROF_PORT"
+	pprofPortFlag    = flag.Int(
+		"pprof_port",
+		0,
+		"This is the port for pprof",
+	)
 )
 
-var restApiPortEnvName = "REST_PORT"
-var restApiPortFlag = flag.Int(
-	"rest_port",
-	0,
-	"This is the port for REST API (grpc mirror) listening.",
-)
-
-var msPersistenceGrpcHostEnvName = "MS_PERSISTENCE_GRPC_HOST"
-var msPersistenceGrpcHostFlag = flag.String(
-	"ms_persistence_grpc_host",
-	"",
-	"This is the host for grpc connection to ms persistence server.",
-)
-
-// TODO GRACEFULL SHUTDOWN
+// TODO[#0]: Need to make graceful shutdown.
 
 func main() {
 	flag.Parse()
 
-	go func() { // TODO hardcode
-		if err := http.ListenAndServe(":3333", nil); err != nil {
-			fmt.Printf("%s\n", err.Error())
+	logger := newLogger()
+
+	go func() {
+		if err := http.ListenAndServe(getAddressFromPortFlag(
+			pprofPortFlag, pprofPortEnvName), nil); err != nil {
+			logger.WithError(err).Error("can not start pprof")
 		}
 	}()
-	logger := logrus.NewEntry(
-		log.ProvideLogrusLoggerUseFlags(),
-	)
 
-	logger.Info("Starting grpc")
+	logger.Info("starting grpc")
 	gRpcStarting := make(chan struct{})
 	go runGRpcListener(logger, gRpcStarting)
 	<-gRpcStarting
-	logger.Info("GRpc listen")
+	logger.Info("grpc listening started")
 
-	logger.Info("Starting http REST Api middleware.")
+	logger.Info("starting http REST API middleware")
 	httpStarting := make(chan struct{})
-	go func(httpStarting <-chan struct{}) {
+	go func() {
 		<-httpStarting
-		logger.Info("Http REST API listen")
-	}(httpStarting)
+		logger.Info("http REST API listening started")
+	}()
 	runHttpRestListener(logger, httpStarting)
 
 	return
@@ -91,12 +100,10 @@ func runGRpcListener(logger *logrus.Entry, done chan<- struct{}) {
 	}
 
 	grpcServer := grpc.NewServer(
-		grpc.MaxRecvMsgSize(18*1024*1024), // 18 Mb
-		grpc.MaxSendMsgSize(18*1024*1024), // 18 Mb
 		grpc.UnaryInterceptor(
-			grpc_middleware.ChainUnaryServer(
-				grpc_validator.UnaryServerInterceptor(),
-				log_context.ProvideLogContextInterceptor(
+			grpcmiddleware.ChainUnaryServer(
+				grpcvalidator.UnaryServerInterceptor(),
+				logcontext.ProvideLogContextInterceptor(
 					log.ProvideLogrusLoggerUseFlags(),
 				).LogContextUnaryServerInterceptor,
 			),
@@ -108,11 +115,11 @@ func runGRpcListener(logger *logrus.Entry, done chan<- struct{}) {
 		msPersistenceGrpcHostFlag, msPersistenceGrpcHostEnvName,
 	), grpc.WithInsecure())
 	if err != nil {
-		logger.Fatalf("did not connect to ms_persistence: %s", err)
+		logger.Fatalf("did not connect to ms_persistence: %s\n", err)
 	}
 	defer func() {
 		if err := conn.Close(); err != nil {
-			logger.Fatalf("can not to close ms_persistence sonnection")
+			logger.Fatal("can not to close ms_persistence sonnection")
 		}
 	}()
 
@@ -139,7 +146,7 @@ func runHttpRestListener(logger *logrus.Entry, done chan<- struct{}) {
 		gRpcPortEnvName,
 	)
 	err := api.RegisterMsGenerationHandlerFromEndpoint(
-		contextWithLogger(),
+		newContextWithLogger(),
 		muxServer,
 		grpcAddress,
 		dialOptions,
@@ -154,18 +161,18 @@ func runHttpRestListener(logger *logrus.Entry, done chan<- struct{}) {
 	logger.WithField("rest_port", listenAddress).
 		WithField("grpc_port", grpcAddress).
 		Info("start REST")
-	server := &http.Server{
-		Addr: listenAddress,
-		// TODO: create flag for turn on cors and flag for allowed IP
+	// TODO[#1]: create flag for allowed origins coors. (* by default).
+	restServer := &http.Server{
+		Addr:    listenAddress,
 		Handler: allowCORS(muxServer),
 	}
 	done <- struct{}{}
-	if err := server.ListenAndServe(); err != nil {
+	if err := restServer.ListenAndServe(); err != nil {
 		logger.Fatalf("failed to start http endpoint: %s\n", err.Error())
 	}
 }
 
-// allowCORS allows Cross Origin Resoruce Sharing from any origin.
+// allowCORS allows Cross Origin Resources Sharing from any origin.
 // Don't do this without consideration in production systems.
 func allowCORS(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -179,8 +186,11 @@ func allowCORS(h http.Handler) http.Handler {
 
 func setupCORS(w *http.ResponseWriter, req *http.Request) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Grpc-Metadata-auth-token, Grpc-Metadata-app-name, Host, Origin")
+	(*w).Header().Set("Access-Control-Allow-Methods",
+		"POST, GET, OPTIONS, PUT, DELETE")
+	(*w).Header().Set("Access-Control-Allow-Headers",
+		"Accept, Content-Type, Content-Length, Accept-Encoding, "+
+			"X-CSRF-Token, Authorization, Host, Origin")
 }
 
 // preflightHandler adds the necessary headers in order to serve
@@ -203,70 +213,15 @@ func getAddressFromPortFlag(portFlag *int, portEnvName string) string {
 	)
 }
 
-func contextWithLogger() context.Context {
-	return log_context.WithLogger(
+func newContextWithLogger() context.Context {
+	return logcontext.WithLogger(
 		context.Background(),
-		logrus.NewEntry(
-			logrus.New(),
-		),
+		newLogger(),
 	)
 }
 
-// func main() {
-// 	// генерирует с
-// 	serv := ms_gen.NewService()
-// 	addDeviceResponse, err := serv.AddDevice(
-// 		context.Background(),
-// 		&api.AddDeviceRequest{
-// 			Device: &api.Device{
-// 				DeviceId: &api.DeviceId{
-// 					Name: "#1",
-// 				},
-// 				Frequency: 2,
-// 			},
-// 		})
-// 	if err != nil {
-// 		fmt.Println(err.Error())
-// 	}
-// 	fmt.Printf("add response %+v\n", addDeviceResponse)
-// 	time.Sleep(3*time.Second)
-// 	addDeviceResponse, err = serv.AddDevice(
-// 		context.Background(),
-// 		&api.AddDeviceRequest{
-// 			Device: &api.Device{
-// 				DeviceId: &api.DeviceId{
-// 					Name: "#2",
-// 				},
-// 				Frequency: 3,
-// 			},
-// 		})
-// 	if err != nil {
-// 		fmt.Println(err.Error())
-// 	}
-// 	fmt.Printf("add response %+v\n", addDeviceResponse)
-// 	time.Sleep(3*time.Second)
-// 	removeDeviceResponse, err := serv.RemoveDevice(
-// 		context.Background(),
-// 		&api.RemoveDeviceRequest{
-// 			DeviceId: &api.DeviceId{
-// 				Name: "#1",
-// 			},
-// 		})
-// 	if err != nil {
-// 		fmt.Println(err.Error())
-// 	}
-// 	fmt.Printf("remove response %+v\n", removeDeviceResponse)
-// 	time.Sleep(3*time.Second)
-// 	removeDeviceResponse, err = serv.RemoveDevice(
-// 		context.Background(),
-// 		&api.RemoveDeviceRequest{
-// 			DeviceId: &api.DeviceId{
-// 				Name: "#2",
-// 			},
-// 		})
-// 	if err != nil {
-// 		fmt.Println(err.Error())
-// 	}
-// 	fmt.Printf("remove response %+v\n", removeDeviceResponse)
-// 	serv.Wait()
-// }
+func newLogger() *logrus.Entry {
+	return logrus.NewEntry(
+		log.ProvideLogrusLoggerUseFlags(),
+	)
+}

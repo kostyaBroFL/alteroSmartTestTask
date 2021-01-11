@@ -81,6 +81,7 @@ services:
     environment:
       - GRPC_PORT=8201
       - REST_PORT=8204
+      - PPROF_PORT=3333
       - LOG_AS_JSON=true
       - LOG_LEVEL=5
       - MS_PERSISTENCE_GRPC_HOST=host.docker.internal:8200
