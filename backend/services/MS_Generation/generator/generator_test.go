@@ -1,15 +1,17 @@
 package generator
 
 import (
-	api "alteroSmartTestTask/backend/services/MS_Generation/common/api"
-	log_context "alteroSmartTestTask/common/log/context"
-	"alteroSmartTestTask/common/syncgo"
 	"context"
-	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/suite"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/suite"
+
+	api "alteroSmartTestTask/backend/services/MS_Generation/common/api"
+	logcontext "alteroSmartTestTask/common/log/context"
+	"alteroSmartTestTask/common/syncgo"
 )
 
 var (
@@ -26,7 +28,7 @@ var (
 
 type generatorTest struct {
 	suite.Suite
-	generator *Generator
+	generator *generator
 	ctx       context.Context
 	cancel    func()
 	wg        *sync.WaitGroup
@@ -36,7 +38,7 @@ func (g *generatorTest) SetupTest() {
 	g.wg = &sync.WaitGroup{}
 	g.generator = NewGenerator()
 	cancelContext, cancelFunc := context.WithCancel(context.Background())
-	g.ctx = log_context.WithLogger(
+	g.ctx = logcontext.WithLogger(
 		cancelContext,
 		logrus.NewEntry(logrus.New()),
 	)
