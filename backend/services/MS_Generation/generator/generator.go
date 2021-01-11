@@ -1,32 +1,34 @@
 package generator
 
 import (
-	api "alteroSmartTestTask/backend/services/MS_Generation/common/api"
-	log_context "alteroSmartTestTask/common/log/context"
-	"alteroSmartTestTask/common/syncgo"
 	"context"
-	"errors"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"math/rand"
 	"sync"
 	"time"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	api "alteroSmartTestTask/backend/services/MS_Generation/common/api"
+	"alteroSmartTestTask/common/errors"
+	log_context "alteroSmartTestTask/common/log/context"
+	"alteroSmartTestTask/common/syncgo"
 )
 
-type generator struct {
+type Generator struct {
 	deviceListMutex *sync.RWMutex
 	deviceList      map[string]context.CancelFunc
 	wg              *sync.WaitGroup
 }
 
-func NewGenerator() *generator {
-	return &generator{
+func NewGenerator() *Generator {
+	return &Generator{
 		deviceListMutex: &sync.RWMutex{},
 		deviceList:      make(map[string]context.CancelFunc),
 		wg:              &sync.WaitGroup{},
 	}
 }
 
-func (g *generator) CreateDevice(
+func (g *Generator) CreateDevice(
 	ctx context.Context,
 	device *api.Device,
 ) (<-chan *api.DeviceData, error) {
@@ -41,7 +43,7 @@ func (g *generator) CreateDevice(
 	return dataChan, nil
 }
 
-func (g *generator) runGeneratorWithContext(
+func (g *Generator) runGeneratorWithContext(
 	ctx context.Context,
 	device *api.Device,
 	dataChan chan<- *api.DeviceData,
@@ -74,20 +76,20 @@ func (g *generator) runGeneratorWithContext(
 	}()
 }
 
-func (g *generator) RemoveDevice(
-	ctx context.Context, device *api.Device,
+func (g *Generator) RemoveDevice(
+	ctx context.Context, deviceId *api.DeviceId,
 ) error {
 	g.deviceListMutex.Lock()
-	cancel, ok := g.deviceList[device.GetDeviceId().GetName()]
+	cancel, ok := g.deviceList[deviceId.GetName()]
 	if !ok {
 		return errors.New("device not found")
 	}
 	cancel()
-	g.deviceList[device.GetDeviceId().GetName()] = nil
+	g.deviceList[deviceId.GetName()] = nil
 	g.deviceListMutex.Unlock()
 	return nil
 }
 
-func (g *generator) Wait() {
+func (g *Generator) Wait() {
 	g.wg.Wait()
 }

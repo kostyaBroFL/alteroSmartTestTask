@@ -15,17 +15,18 @@ import (
 var (
 	testDeviceName      = "testDeviceName"
 	testDeviceFrequency = int32(500)
-	testDevice          = &api.Device{
-		DeviceId: &api.DeviceId{
-			Name: testDeviceName,
-		},
+	testDeviceId        = &api.DeviceId{
+		Name: testDeviceName,
+	}
+	testDevice = &api.Device{
+		DeviceId:  testDeviceId,
 		Frequency: testDeviceFrequency,
 	}
 )
 
 type generatorTest struct {
 	suite.Suite
-	generator *generator
+	generator *Generator
 	ctx       context.Context
 	cancel    func()
 	wg        *sync.WaitGroup
@@ -60,20 +61,21 @@ func (g *generatorTest) TestCreateDeviceFreq() {
 	})
 	g.wg.Wait()
 	g.Assert().Equal(testDeviceFrequency/4, counter)
-	err = g.generator.RemoveDevice(g.ctx, testDevice)
+	err = g.generator.RemoveDevice(g.ctx, testDeviceId)
 	g.Require().Nil(err)
 	g.generator.Wait()
 }
 
-// func (g *generatorTest) TestCreateDeviceDuplicateError() {
-// 	_, err := g.generator.CreateDevice(g.ctx, testDevice)
-// 	g.Require().Nil(err)
-// 	_, err = g.generator.CreateDevice(g.ctx, testDevice)
-// 	g.Assert().Contains(err, "already exists")
-// 	err = g.generator.RemoveDevice(g.ctx, testDevice)
-// 	g.Require().Nil(err)
-// 	g.generator.Wait()
-// }
+func (g *generatorTest) TestCreateDeviceDuplicateError() {
+	_, err := g.generator.CreateDevice(g.ctx, testDevice)
+	g.Require().Nil(err)
+	_, err = g.generator.CreateDevice(g.ctx, testDevice)
+	g.Require().NotNil(err)
+	g.Assert().Contains(err, "already exists")
+	err = g.generator.RemoveDevice(g.ctx, testDeviceId)
+	g.Require().Nil(err)
+	g.generator.Wait()
+}
 
 func TestGenerator(t *testing.T) {
 	suite.Run(t, new(generatorTest))
