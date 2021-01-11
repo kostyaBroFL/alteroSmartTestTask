@@ -8,34 +8,36 @@ import (
 	"net/http"
 	"strings"
 
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
+	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpcvalidator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
 	api "alteroSmartTestTask/backend/services/MS_Persistence/common/api"
-	db_client "alteroSmartTestTask/backend/services/MS_Persistence/database"
-	ms_persistence "alteroSmartTestTask/backend/services/MS_Persistence/server"
+	dbclient "alteroSmartTestTask/backend/services/MS_Persistence/database"
+	mspersistence "alteroSmartTestTask/backend/services/MS_Persistence/server"
 	db "alteroSmartTestTask/common/database"
 	"alteroSmartTestTask/common/flagenv"
 	"alteroSmartTestTask/common/log"
-	log_context "alteroSmartTestTask/common/log/context"
+	logcontext "alteroSmartTestTask/common/log/context"
 )
 
-var gRpcPortEnvName = "GRPC_PORT"
-var gRpcPortFlag = flag.Int(
-	"groc_port",
-	0,
-	"This is the port from which server will listen grpc.",
-)
+var (
+	gRpcPortEnvName = "GRPC_PORT"
+	gRpcPortFlag    = flag.Int(
+		"grpc_port",
+		0,
+		"This is the port from which server will listen grpc.",
+	)
 
-var restApiPortEnvName = "REST_PORT"
-var restApiPortFlag = flag.Int(
-	"rest_port",
-	0,
-	"This is the port for REST API (grpc mirror) listening.",
+	restApiPortEnvName = "REST_PORT"
+	restApiPortFlag    = flag.Int(
+		"rest_port",
+		0,
+		"This is the port for REST API (grpc mirror) listening.",
+	)
 )
 
 func main() {
@@ -45,17 +47,17 @@ func main() {
 		log.ProvideLogrusLoggerUseFlags(),
 	)
 
-	logger.Info("Starting grpc")
+	logger.Info("starting grpc")
 	gRpcStarting := make(chan struct{})
 	go runGRpcListener(logger, gRpcStarting)
 	<-gRpcStarting
-	logger.Info("GRpc listen")
+	logger.Info("grpc listen")
 
-	logger.Info("Starting http REST Api middleware.")
+	logger.Info("starting http REST API middleware")
 	httpStarting := make(chan struct{})
 	go func(httpStarting <-chan struct{}) {
 		<-httpStarting
-		logger.Info("Http REST API listen")
+		logger.Info("http REST API listen")
 	}(httpStarting)
 	runHttpRestListener(logger, httpStarting)
 
@@ -76,12 +78,10 @@ func runGRpcListener(logger *logrus.Entry, done chan<- struct{}) {
 	}
 
 	grpcServer := grpc.NewServer(
-		grpc.MaxRecvMsgSize(18*1024*1024), // 18 Mb
-		grpc.MaxSendMsgSize(18*1024*1024), // 18 Mb
 		grpc.UnaryInterceptor(
-			grpc_middleware.ChainUnaryServer(
-				grpc_validator.UnaryServerInterceptor(),
-				log_context.ProvideLogContextInterceptor(
+			grpcmiddleware.ChainUnaryServer(
+				grpcvalidator.UnaryServerInterceptor(),
+				logcontext.ProvideLogContextInterceptor(
 					log.ProvideLogrusLoggerUseFlags(),
 				).LogContextUnaryServerInterceptor,
 			),
@@ -89,8 +89,8 @@ func runGRpcListener(logger *logrus.Entry, done chan<- struct{}) {
 	)
 	api.RegisterMsPersistenceServer(
 		grpcServer,
-		ms_persistence.NewService(
-			db_client.NewClient(
+		mspersistence.NewService(
+			dbclient.NewClient(
 				db.MustGetNewPostgresConnectionUseFlags(),
 			),
 		),
@@ -126,13 +126,13 @@ func runHttpRestListener(logger *logrus.Entry, done chan<- struct{}) {
 	logger.WithField("rest_port", listenAddress).
 		WithField("grpc_port", grpcAddress).
 		Info("start REST")
-	server := &http.Server{
-		Addr: listenAddress,
-		// TODO: create flag for turn on cors and flag for allowed IP
+	// TODO[#1]: create flag for allowed origins coors. (* by default).
+	restServer := &http.Server{
+		Addr:    listenAddress,
 		Handler: allowCORS(muxServer),
 	}
 	done <- struct{}{}
-	if err := server.ListenAndServe(); err != nil {
+	if err := restServer.ListenAndServe(); err != nil {
 		logger.Fatalf("failed to start http endpoint: %s\n", err.Error())
 	}
 }
@@ -151,8 +151,11 @@ func allowCORS(h http.Handler) http.Handler {
 
 func setupCORS(w *http.ResponseWriter, req *http.Request) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Grpc-Metadata-auth-token, Grpc-Metadata-app-name, Host, Origin")
+	(*w).Header().Set("Access-Control-Allow-Methods",
+		"POST, GET, OPTIONS, PUT, DELETE")
+	(*w).Header().Set("Access-Control-Allow-Headers",
+		"Accept, Content-Type, Content-Length, Accept-Encoding, "+
+			"X-CSRF-Token, Authorization, Host, Origin")
 }
 
 // preflightHandler adds the necessary headers in order to serve
@@ -176,7 +179,7 @@ func getAddressFromPortFlag(portFlag *int, portEnvName string) string {
 }
 
 func contextWithLogger() context.Context {
-	return log_context.WithLogger(
+	return logcontext.WithLogger(
 		context.Background(),
 		logrus.NewEntry(
 			logrus.New(),
