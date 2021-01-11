@@ -46,6 +46,7 @@ func (p *protoServer) AddDevice(
 ) (*api.AddDeviceResponse, error) {
 	ctx = log_context.WithLogger(ctx,
 		log_context.FromContext(ctx).
+			WithField("server_method", "AddDevice").
 			WithField("device_name", request.GetDevice().GetDeviceId().GetName()).
 			WithField("device_freq", request.GetDevice().GetFrequency()))
 	dataChan, err := p.Generator.CreateDevice(ctx, request.GetDevice())
@@ -60,7 +61,10 @@ func (p *protoServer) AddDevice(
 				return
 			}
 			_, err := p.MsPersistenceClient.SaveData(
-				ctx, &persisapi.SaveDataRequest{
+				log_context.WithLogger(
+					context.Background(),
+					log_context.FromContext(ctx),
+				), &persisapi.SaveDataRequest{
 					DeviceData: generationDeviceDataToPersistence(data),
 				})
 			if err != nil {

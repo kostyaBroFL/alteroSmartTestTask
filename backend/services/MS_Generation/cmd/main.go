@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	_ "net/http/pprof"
 	"strings"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -38,11 +39,11 @@ var restApiPortFlag = flag.Int(
 	"This is the port for REST API (grpc mirror) listening.",
 )
 
-var msPersistenceGrpcPortEnvName = "MS_PERSISTENCE_GRPC"
-var msPersistenceGrpcPortFlag = flag.Int(
-	"ms_persistence_grpc",
-	0,
-	"This is the port for grpc connection to ms persistence server.",
+var msPersistenceGrpcHostEnvName = "MS_PERSISTENCE_GRPC_HOST"
+var msPersistenceGrpcHostFlag = flag.String(
+	"ms_persistence_grpc_host",
+	"",
+	"This is the host for grpc connection to ms persistence server.",
 )
 
 // TODO GRACEFULL SHUTDOWN
@@ -50,6 +51,11 @@ var msPersistenceGrpcPortFlag = flag.Int(
 func main() {
 	flag.Parse()
 
+	go func() { // TODO hardcode
+		if err := http.ListenAndServe(":3333", nil); err != nil {
+			fmt.Printf("%s\n", err.Error())
+		}
+	}()
 	logger := logrus.NewEntry(
 		log.ProvideLogrusLoggerUseFlags(),
 	)
@@ -98,8 +104,8 @@ func runGRpcListener(logger *logrus.Entry, done chan<- struct{}) {
 	)
 
 	var conn *grpc.ClientConn
-	conn, err = grpc.Dial(getAddressFromPortFlag(
-		msPersistenceGrpcPortFlag, msPersistenceGrpcPortEnvName,
+	conn, err = grpc.Dial(flagenv.MustParseString(
+		msPersistenceGrpcHostFlag, msPersistenceGrpcHostEnvName,
 	), grpc.WithInsecure())
 	if err != nil {
 		logger.Fatalf("did not connect to ms_persistence: %s", err)

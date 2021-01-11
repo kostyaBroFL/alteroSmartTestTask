@@ -32,6 +32,9 @@ func (g *generator) CreateDevice(
 	ctx context.Context,
 	device *api.Device,
 ) (<-chan *api.DeviceData, error) {
+	localContext := log_context.WithLogger(
+		context.Background(),
+		log_context.FromContext(ctx))
 	g.deviceListMutex.RLock()
 	if _, ok := g.deviceList[device.GetDeviceId().GetName()]; ok {
 		g.deviceListMutex.RUnlock()
@@ -44,8 +47,8 @@ func (g *generator) CreateDevice(
 
 	dataChan := make(chan *api.DeviceData)
 	ctxCancel, cancel := context.WithCancel(
-		log_context.WithLogger(ctx,
-			log_context.FromContext(ctx).
+		log_context.WithLogger(localContext,
+			log_context.FromContext(localContext).
 				WithField("device_name", device.GetDeviceId().GetName()),
 		))
 	g.deviceListMutex.Lock()
@@ -66,7 +69,7 @@ func (g *generator) RemoveDevice(
 	}
 	cancel()
 	g.deviceListMutex.Lock()
-	g.deviceList[deviceId.GetName()] = nil
+	delete(g.deviceList, deviceId.GetName())
 	g.deviceListMutex.Unlock()
 	return nil
 }
