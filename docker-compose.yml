@@ -23,7 +23,6 @@ services:
 #      - ms_persistence_db_volume:/var/lib/postgresql/data
     ports:
       - 5433:5432
-
   ms_persistence_db_migration:
     build:
       context: .
@@ -39,8 +38,8 @@ services:
     networks:
       - ms_persistence
     depends_on:
-      - ms_persistence_db
-
+      "ms_persistence_db":
+        condition: service_started
   ms_persistence_service:
     container_name: ms_persistence_service
     image: ms_persistence_service
@@ -50,6 +49,7 @@ services:
       dockerfile: ./backend/services/MS_Persistence/Dockerfile
     ports:
       - 8203:8203
+      - 8200:8200
     environment:
       - GRPC_PORT=8200
       - REST_PORT=8203
@@ -63,5 +63,27 @@ services:
     networks:
       - ms_persistence
     depends_on:
-      - ms_persistence_db
-      - ms_persistence_db_migration
+      "ms_persistence_db_migration":
+        condition: service_started
+      "ms_persistence_db":
+          condition: service_started
+  ms_generation_service:
+    container_name: ms_generation_service
+    image: ms_generation_service
+    build:
+      context: .
+      dockerfile: ./backend/services/MS_Generation/Dockerfile
+    ports:
+      - 3333:3333
+      - 8204:8204
+    networks:
+      - ms_persistence
+    environment:
+      - GRPC_PORT=8201
+      - REST_PORT=8204
+      - LOG_AS_JSON=true
+      - LOG_LEVEL=5
+      - MS_PERSISTENCE_GRPC_HOST=host.docker.internal:8200
+    depends_on:
+      "ms_persistence_service":
+        condition: service_started
