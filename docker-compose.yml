@@ -43,7 +43,6 @@ services:
   ms_persistence_service:
     container_name: ms_persistence_service
     image: ms_persistence_service
-  #    command: ls
     build:
       context: .
       dockerfile: ./backend/services/MS_Persistence/Dockerfile
