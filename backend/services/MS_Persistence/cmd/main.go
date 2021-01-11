@@ -87,12 +87,18 @@ func runGRpcListener(logger *logrus.Entry, done chan<- struct{}) {
 			),
 		),
 	)
+	databaseClient := dbclient.NewClient(
+		db.MustGetNewPostgresConnectionUseFlags(),
+	)
+	defer func() {
+		if err := databaseClient.Close(); err != nil {
+			logger.WithError(err).Error("can not close database client")
+		}
+	}()
 	api.RegisterMsPersistenceServer(
 		grpcServer,
 		mspersistence.NewService(
-			dbclient.NewClient(
-				db.MustGetNewPostgresConnectionUseFlags(),
-			),
+			databaseClient,
 		),
 	)
 	reflection.Register(grpcServer)
