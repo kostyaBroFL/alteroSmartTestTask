@@ -12,6 +12,8 @@ import (
 	logcontext "alteroSmartTestTask/common/log/context"
 )
 
+var timeFormat = "2006-01-02T15:04:05.999999999Z"
+
 type DatabaseClient interface {
 	GetDeviceId(ctx context.Context, req *database.GetDeviceIdReq) (int64, error)
 	InsertDeviceData(ctx context.Context, req *database.InsertDeviceDataReq) error
@@ -43,10 +45,12 @@ func (s *service) SaveData(
 	}
 	err = s.DatabaseClient.InsertDeviceData(ctx,
 		&database.InsertDeviceDataReq{
-			DeviceId:         id,
-			Data:             request.GetDeviceData().GetData(),
-			TimestampSeconds: request.GetDeviceData().GetTimestamp().GetSeconds(),
-			TimestampNanos:   request.GetDeviceData().GetTimestamp().GetNanos(),
+			DeviceId: id,
+			Data:     request.GetDeviceData().GetData(),
+			Timestamp: time.Unix(
+				request.GetDeviceData().GetTimestamp().GetSeconds(),
+				int64(request.GetDeviceData().GetTimestamp().GetNanos()),
+			).Format(timeFormat),
 		})
 	if err != nil {
 		return nil, errors.ToFrontendError(ctx, err, codes.Internal, "Insert device data error.")
@@ -68,7 +72,7 @@ func (s *service) GetData(
 	}
 	var apiData []*api.DeviceData
 	for _, data := range dataList {
-		dataTime, err := time.Parse("2006-01-02T15:04:05.999999999Z", data.Timestamp)
+		dataTime, err := time.Parse(timeFormat, data.Timestamp)
 		if err != nil {
 			return nil, errors.ToFrontendError(ctx, err, codes.Internal, "Data error")
 		}

@@ -6,6 +6,8 @@ import (
 	// _ "github.com/jackc/pgx/v4"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+
+	log_context "alteroSmartTestTask/common/log/context"
 )
 
 var getDeviceQuery = `insert into device(name) 
@@ -17,7 +19,8 @@ var insertDeviceDataQuery = `insert into
     device_data(device_id, data, timestamp) 
     VALUES (:device_id, :data, :timestamp);`
 
-var getDeviceDataByDeviceName = `select * from device_data 
+var getDeviceDataByDeviceName = `select id, device_id, data, timestamp 
+	from device_data 
 	where device_id = (select id from device where name = :device_name) 
 	order by timestamp desc 
 	limit :limit;`
@@ -54,10 +57,9 @@ func (c *client) GetDeviceId(ctx context.Context, req *GetDeviceIdReq) (int64, e
 }
 
 type InsertDeviceDataReq struct {
-	DeviceId         int64   `db:"device_id"`
-	Data             float64 `db:"data"`
-	TimestampSeconds int64   `db:"timestamp_seconds"`
-	TimestampNanos   int32   `db:"timestamp_nanos"`
+	DeviceId  int64   `db:"device_id"`
+	Data      float64 `db:"data"`
+	Timestamp string  `db:"timestamp"`
 }
 
 func (c *client) InsertDeviceData(ctx context.Context, req *InsertDeviceDataReq) error {
@@ -75,8 +77,8 @@ type GetDataByDeviceNameRequest struct {
 }
 
 type DeviceData struct {
-	id        int32   `db:"id"`
-	deviceId  int32   `db:"device_id"`
+	Id        int32   `db:"id"`
+	DeviceId  int32   `db:"device_id"`
 	Data      float64 `db:"data"`
 	Timestamp string  `db:"timestamp"`
 }
@@ -85,19 +87,32 @@ func (c *client) GetDataByDeviceName(
 	ctx context.Context,
 	req *GetDataByDeviceNameRequest,
 ) ([]*DeviceData, error) {
+	ctx = log_context.WithLogger(ctx, log_context.FromContext(ctx).
+		WithField("db_method", "GetDataByDeviceName").
+		WithField("device_name", req.DeviceName).
+		WithField("limit", req.Limit))
 	rows, err := c.db.NamedQueryContext(ctx, getDeviceDataByDeviceName, req)
 	if err != nil {
+		log_context.FromContext(ctx).WithError(err).
+			Error("get device data error")
 		return nil, err
 	}
 	var output []*DeviceData
-	defer rows.Close() // todo err & search olso
+	defer func() {
+		if err = rows.Close(); err != nil {
+			log_context.FromContext(ctx).WithError(err).
+				Error("can not to close row")
+		}
+	}()
 	for rows.Next() {
-		var data *DeviceData
-		err := rows.StructScan(data)
-		if err != nil {
+		data := &DeviceData{}
+		if err := rows.StructScan(data); err != nil {
+			log_context.FromContext(ctx).WithError(err).
+				Error("can not scan device data")
 			return nil, err
 		}
 		output = append(output, data)
 	}
+	log_context.FromContext(ctx).Info("db success")
 	return output, nil
 }
