@@ -71,10 +71,20 @@ func (g *generatorTest) TestCreateDeviceDuplicateError() {
 	g.Require().Nil(err)
 	_, err = g.generator.CreateDevice(g.ctx, testDevice)
 	g.Require().NotNil(err)
-	g.Assert().Contains(err, "already exists")
+	g.Assert().Contains(err.Error(), "already exists")
 	err = g.generator.RemoveDevice(g.ctx, testDeviceId)
 	g.Require().Nil(err)
 	g.generator.Wait()
+}
+
+func (g *generatorTest) TestRemoveDevice() {
+	dataChan, err := g.generator.CreateDevice(g.ctx, testDevice)
+	g.Require().Nil(err)
+	err = g.generator.RemoveDevice(g.ctx, testDeviceId)
+	g.Require().Nil(err)
+	g.generator.Wait()
+	_, ok := <-dataChan
+	g.Require().False(ok)
 }
 
 func TestGenerator(t *testing.T) {

@@ -6,3 +6,5 @@ gopath
 *.pb.go
 *.pb.gw.go
 *.validator.pb.go
+/ms_generation_start
+/ms_persistence_start

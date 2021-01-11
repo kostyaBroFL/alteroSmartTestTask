@@ -22,7 +22,7 @@ message AddDeviceRequest {
 
 // AddDeviceResponse is the response message for AddDevice method.
 message AddDeviceResponse {
-    AddDeviceStatus status = 1;
+    repeated DeviceId resultedDeviceList = 1;
 }
 
 message RemoveDeviceRequest {
@@ -32,7 +32,9 @@ message RemoveDeviceRequest {
 }
 // todo docs
 
-message RemoveDeviceResponse {}
+message RemoveDeviceResponse {
+    repeated DeviceId resultedDeviceList = 1;
+}
 
 enum AddDeviceStatus {
     UNDEFINED = 0;
