@@ -1,19 +1,21 @@
+// This tools find *.up.sql files and run migrations in order.
+// TODO[#5]: Move code for migration to another package.
+// TODO[#6]: Add migration by specific path.
 package main
 
 import (
-	"alteroSmartTestTask/common/database"
-	"fmt"
 	"io/ioutil"
 	"sort"
 	"strconv"
 	"strings"
+
+	"alteroSmartTestTask/common/database"
 )
 
 func main() {
 	postgresConnection := database.MustGetNewPostgresConnectionUseFlags()
 	listOfMigration := readAllFilesWithUpMigration()
-	for i, migration := range listOfMigration {
-		fmt.Printf("Id %d\n", i)
+	for _, migration := range listOfMigration {
 		_, err := postgresConnection.Exec(migration)
 		if err != nil {
 			panic(err)
