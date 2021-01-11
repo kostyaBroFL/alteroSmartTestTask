@@ -22,28 +22,25 @@ message AddDeviceRequest {
 
 // AddDeviceResponse is the response message for AddDevice method.
 message AddDeviceResponse {
+    // ResultedDeviceList is the list of the run devices.
     repeated DeviceId resultedDeviceList = 1;
 }
 
+// RemoveDeviceRequest is the request message for RemoveDevice method.
 message RemoveDeviceRequest {
+    // DeviceId is the identifier if the device that need to remove.
     DeviceId device_id = 1 [(validator.field) = {
         msg_exists: true
     }];
 }
-// todo docs
 
+// RemoveDeviceResponse is the response message for RemoveDevice method.
 message RemoveDeviceResponse {
+    // ResultedDeviceList is the list of the run devices.
     repeated DeviceId resultedDeviceList = 1;
 }
 
-enum AddDeviceStatus {
-    UNDEFINED = 0;
-    SUCCESS = 1;
-    DEVICE_IS_EXISTS = 2;
-}
-
-// TODO: я пытался то что ниже пренести в отдельный файл,
-// но не ввышло в короткое время
+// TODO[#2]: Bottom's data are duplicated in other service.
 
 // Device is the message to describe information about a specific device.
 message Device {

@@ -2,8 +2,6 @@ syntax = "proto3";
 
 option go_package = ".;ms_persistence";
 
-// TODO https://developers.google.com/protocol-buffers/docs/reference/go-generated
-
 import "validator.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -25,18 +23,24 @@ message SaveDataRequest {
 // SaveDataResponse is the response message for SaveData method.
 message SaveDataResponse {}
 
+// GetDataRequest is the request message for GetData method.
 message GetDataRequest {
+    // Limit is the how many last data chunks need to receive.
     int32 limit = 1;
+    // DeviceId is the identifier of the device for which need to get data.
     DeviceId device_id = 2 [(validator.field) = {
         msg_exists: true
     }];
 }
 
+// GetDataResponse is the response message for GetData method.
 message GetDataResponse {
+    // DeviceData is the list of the requested data.
     repeated DeviceData device_data = 1;
 }
 
-//todo
+// TODO[#2]: Bottom's data are duplicated in other service.
+
 // DeviceData is the data that the device sends.
 message DeviceData {
     // DeviceId is the unique identifier of specific device.
