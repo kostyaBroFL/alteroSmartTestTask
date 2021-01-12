@@ -8,7 +8,10 @@ import "google/protobuf/timestamp.proto";
 // MsPersistence is the service that generates the date
 // by simulating multiple devices.
 service MsPersistence {
+    // SaveData is the method for saving chunk of the device's data.
     rpc SaveData (SaveDataRequest) returns (SaveDataResponse);
+    // GetData is the method for loading
+    // any last chunks of the data of specific device.
     rpc GetData (GetDataRequest) returns (GetDataResponse);
 }
 

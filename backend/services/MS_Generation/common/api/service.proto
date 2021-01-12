@@ -8,7 +8,9 @@ import "google/protobuf/timestamp.proto";
 // MsGeneration is the service that generates the date
 // by simulating multiple devices.
 service MsGeneration {
+    // AddDevice is the method for creating and running device emulator.
     rpc AddDevice (AddDeviceRequest) returns (AddDeviceResponse);
+    // RemoveDevice is the method for turn off and remove device.
     rpc RemoveDevice (RemoveDeviceRequest) returns (RemoveDeviceResponse);
 }
 
