@@ -56,6 +56,7 @@ var (
 )
 
 // TODO[#0]: Need to make graceful shutdown.
+// TODO[#8]: DI using https://github.com/Monnoroch/go-inject
 
 func main() {
 	flag.Parse()
@@ -125,7 +126,7 @@ func runGRpcListener(logger *logrus.Entry, done chan<- struct{}) {
 
 	api.RegisterMsGenerationServer(
 		grpcServer,
-		server.NewProtoServer(
+		server.NewServer(
 			generator.NewGenerator(),
 			msperapi.NewMsPersistenceClient(conn),
 		),
