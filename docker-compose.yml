@@ -65,7 +65,7 @@ services:
       "ms_persistence_db_migration":
         condition: service_started
       "ms_persistence_db":
-          condition: service_started
+        condition: service_started
   ms_generation_service:
     container_name: ms_generation_service
     image: ms_generation_service

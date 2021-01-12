@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcvalidator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
@@ -46,6 +47,9 @@ func main() {
 	logger := logrus.NewEntry(
 		log.ProvideLogrusLoggerUseFlags(),
 	)
+
+	logger.Info("wait 3 sec for database")
+	time.Sleep(3 * time.Second)
 
 	logger.Info("starting grpc")
 	gRpcStarting := make(chan struct{})

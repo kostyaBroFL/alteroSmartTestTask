@@ -21,4 +21,4 @@ RUN go mod download && \
 
 ENTRYPOINT ["./ms_persistence_start"]
 
-# todo multistage
+# TODO[#9]: Use multistage build.
